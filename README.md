@@ -1,16 +1,16 @@
 # CT312H: MOBILE PROGRAMMING
 
-## Project Name: ...
+## Project Name: Mini Supermarket Application
 
 Semester 2, Academic year: 2024-2025
 
-**Student ID 1**: ...
+**Student ID 1**: Ngô Thụy Thanh TâmTâm
 
-**Student Name 1**: ...
+**Student Name 1**: B2111949
 
-**Student ID 2**: ...
+**Student ID 2**: Nguyễn Thị Hoài Thương
 
-**Student Name 2**: ...
+**Student Name 2**: B2111959
 
-**Class Number**: ...
+**Class Number**: M01
 
