@@ -1,6 +1,6 @@
 # CT312H: MOBILE PROGRAMMING
 
-## Project Name: Mini-Supermarket Application
+## Project Name: Mini-Supermarket Online Application
 
 Semester 2, Academic year: 2024-2025
 
