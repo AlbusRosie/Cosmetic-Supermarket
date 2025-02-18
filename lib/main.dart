@@ -1,6 +1,6 @@
 import 'package:ct312h_project/views/auth.dart';
 import 'package:flutter/material.dart';
-import 'views/auth.dart';
+import './views/auth.dart';
 
 void main() {
   runApp(const MyApp());

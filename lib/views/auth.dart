@@ -30,8 +30,8 @@ class AuthScreen extends StatelessWidget {
                 style: TextStyle(color: Colors.grey),
               ),
               Expanded(
-                  child: Image.asset(
-                "assets/auth.png",
+                child: Image.asset(
+                  "assets/auth.png", 
               )),
               Button(
                 label: "LOGIN",
