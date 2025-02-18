@@ -1,7 +1,4 @@
-// Custom Text Field
-
 import 'package:flutter/material.dart';
-import '../components/colors.dart';
 
 class InputField extends StatelessWidget {
   final String hint;
