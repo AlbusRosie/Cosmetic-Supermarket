@@ -1,9 +1,12 @@
+import 'package:ct312h_project/JSON/users.dart';
 import 'package:flutter/material.dart';
 import '../components/colors.dart';
 import '../components/textField.dart';
 import '../components/button.dart';
 import '../views/signup.dart';
 import '../views/profile.dart';
+import '../SQLite/database_helper.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,10 +18,29 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final username = TextEditingController();
   final password = TextEditingController();
+  final phone = TextEditingController();
+  
 
   bool isChecked = false;
   bool isLoginTrue = false;
 
+  // Log In Methods
+  final db = DatabaseHelper();
+  login()async{
+    Users? userDetails = await db.getUserByPhone(phone.text);
+    var res = await db.authenticate(Users(phone: phone.text, password: password.text));
+    if(res == true){
+      // If result us correct then go to profile or home
+      if(!mounted) return;
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>Profile(profile: userDetails,)));
+    }else{
+      // Otherwise show the error message
+      setState(() {
+        isLoginTrue = true;
+      });
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,9 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
 
                 InputField(
-                    hint: "Username",
+                    hint: "User phone",
                     icon: Icons.account_circle,
-                    controller: username),
+                    controller: phone),
                 InputField(
                   hint: "Password",
                   icon: Icons.lock,
@@ -69,12 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 Button(
                   label: "LOGIN",
-                  press: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const Profile()));
-                  },
+                  press: () { login(); },
                 ),
 
                 Row(

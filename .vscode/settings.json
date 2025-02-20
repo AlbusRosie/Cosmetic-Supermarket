@@ -18,5 +18,8 @@
     "titleBar.inactiveBackground": "#f7cfd899",
     "titleBar.inactiveForeground": "#15202b99"
   },
-"peacock.color": "#F7CFD8"
+"peacock.color": "#F7CFD8",
+"cSpell.words": [
+  "AUTOINCREMENT"
+]
 }

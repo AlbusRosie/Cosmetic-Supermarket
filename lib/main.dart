@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import './views/auth.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

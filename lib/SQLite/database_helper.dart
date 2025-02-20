@@ -8,16 +8,15 @@ class DatabaseHelper {
   String user = '''
     CREATE TABLE users (
       uid INTEGER PRIMARY KEY AUTOINCREMENT,
-      urole TEXT CHECK (urole IN ('customer', 'staff')) NOT NULL DEFAULT 'customer',
-      fullname TEXT NOT NULL,
+      urole TEXT CHECK (urole IN ('1', '2')) NOT NULL DEFAULT '2', 
       uname TEXT NOT NULL,
-      email TEXT NOT NULL UNIQUE,
-      phone TEXT NOT NULL,
+      phone TEXT NOT NULL UNIQUE,
       password TEXT NOT NULL,
-      address TEXT NOT NULL,
-      avt TEXT
+      address TEXT DEFAULT NULL,
+      avt TEXT DEFAULT "assets/no_user.jpg"
     )
   ''';
+  // 1 = admin, 2 = user
 
   String products = '''
     CREATE TABLE products (
@@ -54,10 +53,16 @@ class DatabaseHelper {
     )
   ''';
 
+  // Future<void> deleteDatabase() async {
+  //   final databasePath = await getDatabasesPath();
+  //   final path = join(databasePath, databaseName);
+  //   await databaseFactory.deleteDatabase(path);
+  // }
+
   // Connection is ready
   Future<Database> initDB ()async{
-    final databaseePath = await getDatabasesPath();
-    final path = join(databaseePath, databaseName);
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, databaseName);
 
     return openDatabase(path, version: 1, onCreate: (db, version) async{
       await db.execute(user);
@@ -67,14 +72,27 @@ class DatabaseHelper {
   // Function Methods
 
   // Authentication
-  Future<bool> authenticate(User usr)async{
+  Future<bool> authenticate(Users usr)async{
     final Database db = await initDB();
-    var result = await db.query("select * from users where uname = '${usr.uname}' AND password = '${usr.password}'");
+    var result = await db.rawQuery("select * from users where phone = '${usr.phone}' AND password = '${usr.password}'");
     if(result.isNotEmpty){
       return true;
     }else{
       return false;
     }
+  }
+
+  // Sign Up
+  Future<int> createUser(Users user) async{
+    final Database db = await initDB();
+    return db.insert("users", user.toMap());
+  }
+
+  // Get current User details
+  Future<Users?> getUserByPhone(String phone) async {
+    final Database db = await initDB();
+    var res = await db.query("users", where: "phone = ?", whereArgs: [phone]);
+    return res.isNotEmpty ? Users.fromMap(res.first) : null;
   }
 
 }

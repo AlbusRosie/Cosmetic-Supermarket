@@ -1,11 +1,26 @@
-import 'package:ct312h_project/views/login.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import '../components/colors.dart';
 import '../components/button.dart';
-
+import '../JSON/users.dart';
+import '../views/login.dart';
 
 class Profile extends StatelessWidget{
-  const Profile({super.key});
+  final Users? profile;
+  const Profile({super.key, this.profile});
+
+  // Log Out Function
+  Future<void> logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear stored user data (if used)
+
+    // Navigate to LoginScreen and remove all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (Route<dynamic> route) => false, // Remove all previous routes
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,31 +42,25 @@ class Profile extends StatelessWidget{
                 ),
                   
                 SizedBox(height: 10,),
-                Text("Thanh Tam", style: TextStyle(fontSize: 25, color: primaryColor),),
-                Text("ngothuythanhtam@gmail.com", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 123, 152, 148)),),
+                Text(profile!.uname??"", style: TextStyle(fontSize: 25, color: primaryColor),),
+                Text(profile!.phone??"", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 123, 152, 148)),),
                   
-                Button(label: "SIGN UP", press: (){
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginScreen())
-                  );
-                }),
+                Button(label: "LOG OUT", press: () => logout(context)),
                   
-                const ListTile(
+                ListTile(
                   leading: Icon(Icons.person, size: 30, color: Color.fromARGB(255, 53, 88, 78)),
-                  title: Text("Full Name",style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
-                  subtitle: Text("Ngo Thuy Thanh Tam", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
+                  title: Text("User Name",style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
+                  subtitle: Text(profile!.uname ?? "", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
                 ),
-                const ListTile(
-                  leading: Icon(Icons.email, size: 30, color: Color.fromARGB(255, 53, 88, 78)),
-                  title: Text("Email", style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
-                  subtitle: Text("ngothuythanhtam@gmail.com", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
+                ListTile(
+                  leading: Icon(Icons.phone, size: 30, color: Color.fromARGB(255, 53, 88, 78)),
+                  title: Text("Phone Number", style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
+                  subtitle: Text(profile!.phone ?? "", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
                 ),
-                const ListTile(
-                  leading: Icon(Icons.account_circle, size: 30, color: Color.fromARGB(255, 53, 88, 78)  ),
-                  title: Text("User Name", style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
-                  subtitle: Text("admin", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
+                ListTile(
+                  leading: Icon(Icons.location_pin, size: 30, color: Color.fromARGB(255, 53, 88, 78)  ),
+                  title: Text("Address", style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
+                  subtitle: Text(profile!.address??"", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
                 ),
                   
               ],
