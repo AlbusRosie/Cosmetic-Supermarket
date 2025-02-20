@@ -43,7 +43,7 @@ class Profile extends StatelessWidget{
                   
                 SizedBox(height: 10,),
                 Text(profile!.uname??"", style: TextStyle(fontSize: 25, color: primaryColor),),
-                Text(profile!.phone??"", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 123, 152, 148)),),
+                Text(profile!.phone, style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 123, 152, 148)),),
                   
                 Button(label: "LOG OUT", press: () => logout(context)),
                   
@@ -55,7 +55,7 @@ class Profile extends StatelessWidget{
                 ListTile(
                   leading: Icon(Icons.phone, size: 30, color: Color.fromARGB(255, 53, 88, 78)),
                   title: Text("Phone Number", style: TextStyle(fontSize: 13, color: Color.fromARGB(255, 123, 152, 148))),
-                  subtitle: Text(profile!.phone ?? "", style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
+                  subtitle: Text(profile!.phone, style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 53, 88, 78))),
                 ),
                 ListTile(
                   leading: Icon(Icons.location_pin, size: 30, color: Color.fromARGB(255, 53, 88, 78)  ),
