@@ -43,6 +43,12 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     try {
+      if (password.text != confirmPassword.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Passwords do not match!")),
+        );
+        return;
+      }
       // Create new user with all required fields
       var newUser = Users(
           uname: username.text.trim(),
@@ -55,10 +61,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
       var res = await db.createUser(newUser);
       if (!mounted) return;
-      if (password.text != confirmPassword.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Passwords do not match!")),
-        ); return;}
       if (res > 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Registration successful!")),
