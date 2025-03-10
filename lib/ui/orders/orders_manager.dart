@@ -1,24 +1,11 @@
 import '../../models/cart_item.dart';
 import '../../models/order_item.dart';
 import 'package:flutter/foundation.dart';
+import '../../services/orders_service.dart';
+
 class OrdersManager with ChangeNotifier {
-  final List<OrderItem> _orders = [
-    OrderItem(
-      id: '01',
-      amount: 59.98,
-      products: [
-        CartItem(
-          id: 'c1',
-          title: 'Red Shirt',
-          imageUrl:
-              'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-          price: 29.99,
-          quantity: 2,
-        ),
-      ],
-      dateTime: DateTime.now(),
-    ),
-  ];
+  final OrdersService _ordersService = OrdersService();
+  final List<OrderItem> _orders = [];
 
   int get orderCount {
     return _orders.length;
@@ -27,16 +14,71 @@ class OrdersManager with ChangeNotifier {
   List<OrderItem> get orders {
     return [..._orders];
   }
-  void addOrder(List<CartItem> cartProducts, double total) async {
-    _orders.insert(
-      0,
-      OrderItem(
-        id: 'o${DateTime.now().toIso8601String()}',
-        amount: total,
-        products: cartProducts,
-        dateTime: DateTime.now(),
-      ),
-    );
+
+  Future<void> fetchOrders() async {
+    print("Fetching orders...");
+    final fetchedOrders =
+        await _ordersService.fetchOrders(filteredByUser: true);
+    if (fetchedOrders.isEmpty) {
+      print("No orders found or failed to fetch.");
+    }
+    _orders.clear();
+    _orders.addAll(fetchedOrders);
     notifyListeners();
+  }
+
+  Future<void> addOrder(List<CartItem> cartProducts, double total) async {
+    print('Adding order: total=$total, products=${cartProducts.length}');
+
+    for (var item in cartProducts) {
+      if (item.id == null) {
+        print('Error: Cart item has no ID');
+        return;
+      }
+    }
+    final newOrder = OrderItem(
+      amount: total,
+      products: cartProducts,
+      dateTime: DateTime.now(),
+    );
+
+    final addedOrder = await _ordersService.addOrder(newOrder);
+    if (addedOrder != null) {
+      print('Order successfully added: ${addedOrder.toJson()}');
+      _orders.insert(0, addedOrder);
+      notifyListeners();
+    } else {
+      print('Failed to add order');
+    }
+  }
+
+  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+    final index = _orders.indexWhere((o) => o.id == orderId);
+    if (index != -1) {
+      final updatedOrder = _orders[index].copyWith(status: newStatus);
+      print('Updating order status: ${updatedOrder.toJson()}'); // In dữ liệu đơn hàng trước khi cập nhật
+
+      final result = await _ordersService.updateOrder(updatedOrder);
+      if (result != null) {
+        _orders[index] = result;
+        notifyListeners();
+        print(
+            'Order status updated successfully: ${result.toJson()}'); // In dữ liệu đơn hàng sau khi cập nhật
+      } else {
+        print(
+            'Failed to update order status'); // In thông báo nếu cập nhật thất bại
+      }
+    } else {
+      print(
+          'Order not found with ID: $orderId'); // In thông báo nếu không tìm thấy đơn hàng
+    }
+  }
+
+  Future<void> deleteOrder(String id) async {
+    final success = await _ordersService.deleteOrder(id);
+    if (success) {
+      _orders.removeWhere((o) => o.id == id);
+      notifyListeners();
+    }
   }
 }

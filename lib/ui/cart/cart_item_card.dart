@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/cart_item.dart';
 import '../shared/dialog_utils.dart';
 
-class CartItemCard extends StatelessWidget {
+class CartItemCard extends StatefulWidget {
   final String productId;
   final CartItem cartItem;
 
@@ -15,11 +15,48 @@ class CartItemCard extends StatelessWidget {
   });
 
   @override
+  _CartItemCardState createState() => _CartItemCardState();
+}
+
+class _CartItemCardState extends State<CartItemCard> {
+  late int _quantity;
+
+  @override
+  void initState() {
+    super.initState();
+    _quantity = widget.cartItem.quantity;
+  }
+
+  void _incrementQuantity() {
+    setState(() {
+      _quantity++;
+    });
+    context.read<CartManager>().updateItemQuantity(
+          widget.cartItem.id!,
+          _quantity,
+        );
+  }
+
+  void _decrementQuantity() {
+    if (_quantity > 1) {
+      setState(() {
+        _quantity--;
+      });
+      context.read<CartManager>().updateItemQuantity(
+            widget.cartItem.id!,
+            _quantity,
+          );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Dismissible(
-      key: ValueKey(cartItem.id),
+      key: ValueKey(widget.cartItem.id),
       background: Container(
-        color: Theme.of(context).colorScheme.error,
+        color: colorScheme.error,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         margin: const EdgeInsets.symmetric(
@@ -28,7 +65,7 @@ class CartItemCard extends StatelessWidget {
         ),
         child: const Icon(
           Icons.delete,
-          color: Colors.white,
+          color: Color.fromARGB(255, 249, 74, 74),
           size: 40,
         ),
       ),
@@ -40,45 +77,104 @@ class CartItemCard extends StatelessWidget {
         );
       },
       onDismissed: (direction) {
-        context.read<CartManager>().clearItem(productId);
+        context.read<CartManager>().clearItem(widget.cartItem.id!);
       },
-      child: ItemInfoCard(cartItem),
-    );
-  }
-}
-
-class ItemInfoCard extends StatelessWidget {
-  const ItemInfoCard(
-    this.cartItem, {
-      super.key,
-  });
-
-  final CartItem cartItem;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 4,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListTile(
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: Image.network(
-              cartItem.imageUrl,
-              fit: BoxFit.cover,
-              width: 80,
-              height: 80,
-            ),
-          ),
-          title: Text('${cartItem.title}'),
-          subtitle: Text('Total: \$${(cartItem.price * cartItem.quantity)}'),
-          trailing: Text(
-            '\$${cartItem.quantity} x \$${cartItem.price}',
-            style: Theme.of(context).textTheme.titleMedium,
+      child: Card(
+        color: const Color.fromARGB(255, 255, 235, 235), // Màu hồng nhạt
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Bo góc thẻ
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              // Ảnh sản phẩm
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  widget.cartItem.imageUrl,
+                  fit: BoxFit.cover,
+                  width: 110,
+                  height: 110,
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Thông tin sản phẩm
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Tên sản phẩm
+                    Text(
+                      widget.cartItem.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    // Giá sản phẩm (màu hồng)
+                    Text(
+                      '$_quantity x '
+                      '\$${widget.cartItem.price.toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: const Color.fromARGB(255, 255, 105, 133),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Số lượng và tổng giá
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Nút tăng/giảm số lượng
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 255, 105, 133),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.remove, color: Colors.red),
+                                onPressed: _decrementQuantity,
+                              ),
+                              Text(
+                                '$_quantity',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.add, color: Colors.green),
+                                onPressed: _incrementQuantity,
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Tổng giá tiền
+                        Text(
+                          '\$${(widget.cartItem.price * _quantity).toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            color: Color.fromARGB(255, 102, 102, 102),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),

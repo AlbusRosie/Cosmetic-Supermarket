@@ -1,40 +1,38 @@
 import 'package:flutter/material.dart';
-import 'ui/products/products_manager.dart';
-import 'ui/products/product_detail_screen.dart';
-import 'ui/products/user_products_screen.dart';
-import 'ui/cart/cart_screen.dart';
-import 'ui/orders/orders_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'ui/cart/cart_manager.dart';
-import 'ui/orders/orders_manager.dart';
-import 'ui/products/edit_product_screen.dart';
-void main() {
-  runApp(const Management());
+import 'ui/screens.dart';
+
+Future<void> main() async {
+  await dotenv.load();
+  runApp(const Larana());
 }
 
-class Management extends StatelessWidget {
-  const Management({super.key});
+class Larana extends StatelessWidget {
+  const Larana({super.key});
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: Color.fromARGB(255, 140, 224, 199),
-      secondary: Color.fromARGB(255, 255, 255, 255),
-      surface: Colors.white,
-      surfaceTint: Colors.grey[200],
+      seedColor: const Color.fromARGB(255, 255, 158, 158),
+      secondary: const Color(0xFFFFF8DC), 
+      surface: const Color.fromARGB(
+          255, 255, 245, 245),
+      surfaceTint: const Color.fromARGB(255, 255, 158, 158),
+      primary: const Color.fromARGB(255, 255, 158, 158),
+      onPrimary: Colors.white, 
+      onSecondary: Colors.black,
+      onSurface: Colors.black,
     );
 
-    final themedata = ThemeData(
+    final themeData = ThemeData(
       fontFamily: 'Lato',
       colorScheme: colorScheme,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
         elevation: 4,
-        shadowColor: colorScheme.shadow,
       ),
       dialogTheme: DialogTheme(
-        titleTextStyle: TextStyle(
-          color: colorScheme.onSurface,
+        titleTextStyle: const TextStyle(
           fontSize: 24,
           fontWeight: FontWeight.bold,
         ),
@@ -44,62 +42,38 @@ class Management extends StatelessWidget {
         ),
       ),
     );
+
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (ctx) => ProductsManager(),
-          ),
-          ChangeNotifierProvider(
-            create: (ctx) => CartManager(),
-          ),
-          ChangeNotifierProvider(
-            create: (ctx) => OrdersManager(),
-          ),
-        ],
-        child: MaterialApp(
-          title: 'MyShop',
-          debugShowCheckedModeBanner: false,
-          theme: themedata,
-          home: const UserProductsScreen(),
-          routes: {
-            CartScreen.routeName: (ctx) => const SafeArea(
-                  child: CartScreen(),
-                ),
-            OrdersScreen.routeName: (ctx) => const SafeArea(
-                  child: OrdersScreen(),
-                ),
-            UserProductsScreen.routeName: (ctx) => const SafeArea(
-                  child: UserProductsScreen(),
-                ),
-          },
-          onGenerateRoute: (settings) {
-            if (settings.name == ProductDetailScreen.routeName) {
-              final productId = settings.arguments as String;
-              return MaterialPageRoute(
-                builder: (ctx) {
-                  return SafeArea(
-                      child: ProductDetailScreen(
-                    ctx.read<ProductsManager>().findById(productId)!,
-                  ));
-                },
-              );
-            }
-            if (settings.name == EditProductScreen.routeName) {
-              final productId = settings.arguments as String?;
-              return MaterialPageRoute(
-                builder: (ctx) {
-                  return SafeArea(
-                    child: EditProductScreen(
-                      productId != null
-                          ? ctx.read<ProductsManager>().findById(productId)
-                          : null,
-                    ),
-                  );
-                },
-              );
-            }
-            return null;
-          },
-        ));
+      providers: [
+        ChangeNotifierProvider(create: (ctx) => ProductsManager()),
+        ChangeNotifierProvider(create: (ctx) => CartManager()),
+        ChangeNotifierProvider(create: (ctx) => OrdersManager()),
+        ChangeNotifierProvider(create: (ctx) => AuthManager()),
+      ],
+      child: Consumer<AuthManager>(
+        builder: (ctx, authManager, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: themeData,
+            home: authManager.isAuth
+                ? const SafeArea(child: UserProductsScreen())
+                : FutureBuilder(
+                    future: authManager.tryAutoLogin(),
+                    builder: (ctx, snapshot) {
+                      return snapshot.connectionState == ConnectionState.waiting
+                          ? const SafeArea(child: SplashScreen())
+                          : const SafeArea(child: AuthScreen());
+                    },
+                  ),
+            routes: {
+              CartScreen.routeName: (ctx) =>
+                  const SafeArea(child: CartScreen()),
+              OrdersScreen.routeName: (ctx) =>
+                  const SafeArea(child: OrdersScreen()),
+            },
+          );
+        },
+      ),
+    );
   }
 }

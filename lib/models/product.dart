@@ -1,19 +1,22 @@
+import 'dart:io';
 class Product {
   final String? pid;
-  final String pname;
+  final String title;
   final String description;
   final double price;
-  final String img;
+  final File? featuredImage;
+  final String imageUrl;
   final bool isFavorite;
   final int stockQuantity;
   final String category;
 
   Product({
     this.pid,
-    required this.pname,
+    required this.title,
     required this.description,
     required this.price,
-    required this.img,
+    this.featuredImage,
+    this.imageUrl = '',
     this.isFavorite = false,
     required this.stockQuantity,
     required this.category,
@@ -24,20 +27,50 @@ class Product {
     String? pname,
     String? description,
     double? price,
-    String? img,
+    File? featuredImage,
+    String? imageUrl,
     bool? isFavorite,
     int? stockQuantity,
     String? category,
   }) {
     return Product(
       pid: pid ?? this.pid,
-      pname: pname ?? this.pname,
+      title: pname ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
-      img: img ?? this.img,
+      featuredImage: featuredImage ?? this.featuredImage,
+      imageUrl: imageUrl ?? this.imageUrl,
       isFavorite: isFavorite ?? this.isFavorite,
       stockQuantity: stockQuantity ?? this.stockQuantity,
       category: category ?? this.category,
+    );
+  }
+
+  bool hasFeaturedImage() {
+    return featuredImage != null || imageUrl.isNotEmpty;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'description': description,
+      'price': price,
+      'isFavorite': isFavorite,
+      'stockQuantity':stockQuantity,
+      'category': category,
+    };
+  }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      pid: json['id'] ,
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      price: json['price'] ?? 0.0,
+      isFavorite: json['isFavorite'] ?? false,
+      imageUrl: json['imageUrl'] ?? '',
+      stockQuantity: json['stockQuantity'] ?? 0,
+      category: json['category'] ?? '',
     );
   }
 }

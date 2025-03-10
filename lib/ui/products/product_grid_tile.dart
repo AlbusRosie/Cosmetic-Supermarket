@@ -55,7 +55,7 @@ class ProductGridTile extends StatelessWidget {
             );
           },
           child: Image.network(
-            product.img,
+            product.imageUrl,
             fit: BoxFit.cover,
           ),
         ),
@@ -88,7 +88,7 @@ class ProductGridFooter extends StatelessWidget {
         onPressed: onFavoritePressed,
       ),
       title: Text(
-        product.pname,
+        product.title,
         textAlign: TextAlign.center,
       ),
       trailing: IconButton(
