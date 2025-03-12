@@ -18,17 +18,17 @@ class Button extends StatelessWidget{
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      width: size.width *.9,
+      width: size.width *.8,
       height: 55,
 
       decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.circular(10)
+        color: color4,
+        borderRadius: BorderRadius.circular(50)
       ),
 
       child: TextButton(
         onPressed: press, 
-        child: Text(label, style: TextStyle(color: buttonText, fontSize: 18),)
+        child: Text(label, style: TextStyle(color: color13, fontSize: 18),)
       ),
     );
   }
