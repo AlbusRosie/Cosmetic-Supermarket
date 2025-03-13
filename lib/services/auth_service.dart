@@ -36,7 +36,7 @@ class AuthService {
     }
 
     try {
-      // Kiểm tra xem số điện thoại đã tồn tại chưa
+      // Check if the phone number already exists
       final existingUsers = await pb.collection('users').getList(
             filter: 'phone = "$phone"',
           );
@@ -54,12 +54,12 @@ class AuthService {
         'phone': phone,
         'password': password,
         'passwordConfirm': password,
-        'urole': 'customer', // Gán role mặc định
+        'urole': 'customer', // Default role
       });
 
       print('PocketBase response: ${record.toJson()}');
 
-      // Thêm email vào dữ liệu trả về
+      // Add email to the returned data
       Map<String, dynamic> userData = record.toJson();
       userData['email'] = email;
 

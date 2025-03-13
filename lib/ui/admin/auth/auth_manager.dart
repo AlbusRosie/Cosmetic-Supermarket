@@ -33,6 +33,7 @@ class AuthManager with ChangeNotifier {
   User? get user {
     return _loggedInUser;
   }
+  
 
   Future<void> signup(String username, String email, String phone, String password) async {
     try {
