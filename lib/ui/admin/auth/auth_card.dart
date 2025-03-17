@@ -73,7 +73,7 @@ class _AuthCardState extends State<AuthCard> {
           padding: const EdgeInsets.only(top: 0.0),
           child: Container(
             width: double.infinity,
-            height: size.height * 0.765, // Adjust height to fill the bottom
+            height: size.height * 0.675, // Adjust height to fill the bottom
             decoration: const BoxDecoration(
               color: color17,
               borderRadius: BorderRadius.only(

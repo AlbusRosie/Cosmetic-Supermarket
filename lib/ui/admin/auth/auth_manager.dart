@@ -10,6 +10,12 @@ class AuthManager with ChangeNotifier {
 
   AuthManager() : _authService = AuthService() {
     _initializeAuthListener();
+    // Explicitly initialize and check auth status
+    _isInitialized = false;
+    tryAutoLogin().then((_) {
+      _isInitialized = true;
+      notifyListeners();
+    });
   }
 
   void _initializeAuthListener() {
@@ -22,20 +28,16 @@ class AuthManager with ChangeNotifier {
 
   User? get loggedInUser => _loggedInUser;
 
-  bool get isAuth {
-    return _loggedInUser != null;
-  }
+  bool get isAuth => _loggedInUser != null;
 
-  bool get isInitialized {
-    return _isInitialized;
-  }
+  bool get isStaff => _loggedInUser?.urole == 'staff';
 
-  User? get user {
-    return _loggedInUser;
-  }
-  
+  bool get isCustomer => _loggedInUser?.urole == 'customer';
 
-  Future<void> signup(String username, String email, String phone, String password) async {
+  bool get isInitialized => _isInitialized;
+
+  Future<void> signup(
+      String username, String email, String phone, String password) async {
     try {
       print('🔴 AuthManager: Starting signup process');
       await _authService.signup(username, email, phone, password);
@@ -56,18 +58,30 @@ class AuthManager with ChangeNotifier {
   }
 
   Future<void> tryAutoLogin() async {
+    print('🔴 Starting tryAutoLogin()');
     try {
       final user = await _authService.getUserFromStore();
-      if (_loggedInUser != null) {
+      print(
+          '🔴 getUserFromStore completed: user = ${user != null ? 'exists' : 'null'}');
+
+      if (user != null) {
         _loggedInUser = user;
         notifyListeners();
+      } else {
+        _loggedInUser = null;
+        notifyListeners();
       }
+      print('🔴 tryAutoLogin completed successfully');
     } catch (error) {
       print('🔴 Auto login error: $error');
+      _loggedInUser = null;
+      notifyListeners();
     }
   }
 
   Future<void> logout() async {
-    return _authService.logout();
+    await _authService.logout();
+    _loggedInUser = null;
+    notifyListeners();
   }
 }

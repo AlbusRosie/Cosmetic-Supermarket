@@ -75,7 +75,6 @@ class AuthService {
     }
   }
 
-
   Future<User> login(String email, String password) async {
     final pb = await getPocketbaseInstance();
     if (pb == null) {
@@ -83,7 +82,8 @@ class AuthService {
     }
 
     try {
-      final authRecord = await pb.collection('users').authWithPassword(email, password);
+      final authRecord =
+          await pb.collection('users').authWithPassword(email, password);
       return User.fromJson(authRecord.record.toJson());
     } catch (error) {
       if (error is ClientException) {

@@ -13,30 +13,32 @@ class AuthScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        
         child: Column(
           children: [
             Stack(
               children: [
-                // Background Image
-                SizedBox(
-                  width: size.width,
-                  height: size.height / 5, // Reduce height to bring the image closer to the top
-                  child: Image.asset(
-                    "assets/images/logo.png",
-                    fit: BoxFit.contain, // Prevent image stretching
+                // Background Image with Padding
+                Padding(
+                  padding: const EdgeInsets.only(top: 40), // Cách top 40px
+                  child: SizedBox(
+                    width: size.width,
+                    height: size.height / 3.5, // Điều chỉnh chiều cao logo
+                    child: Image.asset(
+                      "assets/images/logo.png",
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
                 // Back Button
-                Padding(
-                  padding: const EdgeInsets.only(
-                      top: 20, left: 10), // Reduce top padding
+                Positioned(
+                  top: 50, // Điều chỉnh vị trí nút back
+                  left: 10,
                   child: IconButton(
                     color: color4,
                     iconSize: 28,
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(context); // Go back to the previous screen
+                      Navigator.pop(context);
                     },
                   ),
                 ),
