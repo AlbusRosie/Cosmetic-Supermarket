@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../shared/app_drawer.dart';
 import 'orders_manager.dart';
 import '../orders/order_item_cart.dart';
-import 'package:provider/provider.dart';
-
-// Định nghĩa màu sắc chính cho ứng dụng - phù hợp với màu laranaPink
-const Color primaryColor = Color.fromARGB(255, 231, 110, 110);
-const Color secondaryColor = Color(0xFFFFF8DC);
-const Color backgroundColor = Color(0xFFFAFAFA);
+const Color primaryColor = Color.fromARGB(255, 231, 110, 110); // Hồng đậm
+const Color secondaryColor = Color(0xFFFFDDE1); // Hồng nhạt thay cho vàng
+const Color backgroundColor = Color(0xFFFAFAFA); // Giữ nguyên màu nền
 
 class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({super.key});
   static const routeName = '/orders';
 
+  const OrdersScreen({super.key});
+
   @override
-  _OrdersScreenState createState() => _OrdersScreenState();
+  State<OrdersScreen> createState() => _OrdersScreenState();
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isLoading = false;
   late Future<void> _fetchOrders;
-
   @override
   void initState() {
     super.initState();
@@ -28,28 +25,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_isLoading) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<OrdersManager>(context, listen: false)
-          .fetchOrders()
-          .then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        elevation: 0,
+        elevation: 2,
         backgroundColor: secondaryColor,
         title: Text(
           "My Orders",
@@ -60,6 +40,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
           ),
         ),
         iconTheme: IconThemeData(color: primaryColor),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
+        ),
       ),
       drawer: const AppDrawer(),
       body: FutureBuilder(
@@ -67,86 +50,91 @@ class _OrdersScreenState extends State<OrdersScreen> {
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: CircularProgressIndicator(
-                color: primaryColor,
-              ),
+              child: CircularProgressIndicator(color: primaryColor),
             );
           } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 60,
-                    color: primaryColor.withOpacity(0.7),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Something went wrong",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Error: ${snapshot.error}",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return _buildErrorWidget(snapshot.error, primaryColor);
           } else {
             return Consumer<OrdersManager>(
               builder: (ctx, ordersManager, child) {
-                if (ordersManager.orderCount == 0) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 80,
-                          color: primaryColor.withOpacity(0.7),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          "No orders yet",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey[800],
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          "Your order history will appear here",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: ListView.builder(
-                    itemCount: ordersManager.orderCount,
-                    itemBuilder: (ctx, i) =>
-                        OrderItemCard(ordersManager.orders[i]),
-                  ),
-                );
+                return ordersManager.orderCount == 0
+                    ? _buildEmptyOrders(primaryColor)
+                    : _buildOrderList(ordersManager);
               },
             );
           }
         },
+      ),
+    );
+  }
+
+  // Widget hiển thị khi có lỗi
+  Widget _buildErrorWidget(Object? error, Color primaryColor) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 60,
+            color: primaryColor.withOpacity(0.7),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Something went wrong",
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Error: $error",
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget hiển thị khi không có đơn hàng
+  Widget _buildEmptyOrders(Color primaryColor) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.shopping_bag_outlined,
+            size: 80,
+            color: primaryColor.withOpacity(0.7),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "No orders yet",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Your order history will appear here",
+            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget danh sách đơn hàng
+  Widget _buildOrderList(OrdersManager ordersManager) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+      child: ListView.builder(
+        itemCount: ordersManager.orderCount,
+        itemBuilder: (ctx, i) => OrderItemCard(ordersManager.orders[i]),
       ),
     );
   }

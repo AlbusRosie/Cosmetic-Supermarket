@@ -56,7 +56,8 @@ class OrdersManager with ChangeNotifier {
     final index = _orders.indexWhere((o) => o.id == orderId);
     if (index != -1) {
       final updatedOrder = _orders[index].copyWith(status: newStatus);
-      print('Updating order status: ${updatedOrder.toJson()}'); // In dữ liệu đơn hàng trước khi cập nhật
+      print(
+          'Updating order status: ${updatedOrder.toJson()}'); // In dữ liệu đơn hàng trước khi cập nhật
 
       final result = await _ordersService.updateOrder(updatedOrder);
       if (result != null) {

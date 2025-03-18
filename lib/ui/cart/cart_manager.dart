@@ -31,7 +31,7 @@ class CartManager with ChangeNotifier {
     final cartItems = await _cartsService.fetchCartItems(filteredByUser: true);
     _items.clear();
     for (final item in cartItems) {
-      _items[item.id!] = item;
+      _items[item.productId] = item;
     }
     notifyListeners();
   }
@@ -39,7 +39,8 @@ class CartManager with ChangeNotifier {
   Future<void> addItem(Product product, {int quantity = 1}) async {
     if (_items.containsKey(product.pid!)) {
       final updatedQuantity = _items[product.pid]!.quantity + quantity;
-      _items[product.pid!] = _items[product.pid]!.copyWith(quantity: updatedQuantity);
+      _items[product.pid!] =
+          _items[product.pid]!.copyWith(quantity: updatedQuantity);
 
       await _cartsService.updateCartItem(_items[product.pid]!);
     } else {
@@ -57,6 +58,7 @@ class CartManager with ChangeNotifier {
     }
     notifyListeners();
   }
+
   Future<void> updateItem(CartItem item) async {
     final updatedItem = await _cartsService.updateCartItem(item);
     if (updatedItem != null) {
@@ -79,7 +81,8 @@ class CartManager with ChangeNotifier {
       );
       await _cartsService.updateCartItem(_items[productId]!);
     } else {
-      final success = await _cartsService.deleteCartItem(_items[productId]!.id!);
+      final success =
+          await _cartsService.deleteCartItem(_items[productId]!.id!);
       if (success) {
         _items.remove(productId);
       }

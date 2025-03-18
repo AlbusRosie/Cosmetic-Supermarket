@@ -20,7 +20,8 @@ class UserProductsScreen extends StatefulWidget {
   State<UserProductsScreen> createState() => _UserProductsScreenState();
 }
 
-class _UserProductsScreenState extends State<UserProductsScreen> {
+class _UserProductsScreenState extends State<UserProductsScreen>
+    with TickerProviderStateMixin {
   int _visibleItemCount = 6;
 
   String searchQuery = "";
@@ -33,31 +34,34 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
 
   late Future<void> _fetchProducts;
 
+  late AnimationController _appBarButtonController;
+  late Animation<double> _appBarScaleAnimation;
+  late Animation<double> _appBarFadeAnimation;
+
   @override
   void initState() {
     super.initState();
     _fetchProducts = context.read<ProductsManager>().fetchProducts();
     context.read<CartManager>().fetchCartItems();
     _scrollController.addListener(_onScroll);
-  }
 
-  final List<Map<String, dynamic>> categories = [
-    {"name": "All", "icon": Icons.category},
-    {"name": "Lipsticks", "icon": Icons.face},
-    {"name": "Lip Glosses", "icon": Icons.face_retouching_natural},
-    {"name": "Blushes", "icon": Icons.brush},
-    {"name": "Foundations", "icon": Icons.format_paint},
-    {"name": "Concealers", "icon": Icons.blur_on},
-    {"name": "Powders", "icon": Icons.cloud},
-    {"name": "Eyeshadows", "icon": Icons.visibility},
-    {"name": "Eyeliners", "icon": Icons.edit},
-    {"name": "Mascaras", "icon": Icons.remove_red_eye},
-  ];
+    _appBarButtonController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _appBarScaleAnimation = Tween<double>(begin: 1.0, end: 1.2).animate(
+      CurvedAnimation(parent: _appBarButtonController, curve: Curves.easeInOut),
+    );
+    _appBarFadeAnimation = Tween<double>(begin: 1.0, end: 0.8).animate(
+      CurvedAnimation(parent: _appBarButtonController, curve: Curves.easeInOut),
+    );
+  }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
+    _appBarButtonController.dispose();
     super.dispose();
   }
 
@@ -70,33 +74,64 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
     }
   }
 
+  void _animateAppBarButton() {
+    _appBarButtonController.forward().then((_) {
+      _appBarButtonController.reverse();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color.fromARGB(255, 255, 245, 245),
       appBar: AppBar(
-        backgroundColor: laranaYellow,
+        backgroundColor: Colors.white,
         elevation: 0,
         title: Transform.translate(
-          offset: Offset(-40, 0),
+          offset: const Offset(-40, 0),
           child: Image.asset(
             'assets/images/lanara.png',
             height: 140,
             fit: BoxFit.contain,
           ),
         ),
+        iconTheme: IconThemeData(color: laranaPink),
         actions: <Widget>[
-          ProductFilterMenu(
-            currentFilter: _currentFilter,
-            onFilterSelected: (filter) {
-              setState(() {
-                _currentFilter = filter;
-              });
+          AnimatedBuilder(
+            animation: _appBarButtonController,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _appBarFadeAnimation,
+                child: ScaleTransition(
+                  scale: _appBarScaleAnimation,
+                  child: ProductFilterMenu(
+                    currentFilter: _currentFilter,
+                    onFilterSelected: (filter) {
+                      _animateAppBarButton();
+                      setState(() {
+                        _currentFilter = filter;
+                      });
+                    },
+                  ),
+                ),
+              );
             },
           ),
-          ShoppingCartButton(
-            onPressed: () {
-              Navigator.of(context).pushNamed(CartScreen.routeName);
+          AnimatedBuilder(
+            animation: _appBarButtonController,
+            builder: (context, child) {
+              return FadeTransition(
+                opacity: _appBarFadeAnimation,
+                child: ScaleTransition(
+                  scale: _appBarScaleAnimation,
+                  child: ShoppingCartButton(
+                    onPressed: () {
+                      _animateAppBarButton();
+                      Navigator.of(context).pushNamed(CartScreen.routeName);
+                    },
+                  ),
+                ),
+              );
             },
           ),
         ],
@@ -156,7 +191,7 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: SizedBox(
-                    height: 50,
+                    height: 50, // Giữ nguyên 50
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
@@ -164,75 +199,17 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
                         final category = categories[index]["name"] as String;
                         final categoryIcon =
                             categories[index]["icon"] as IconData;
-                        return GestureDetector(
+                        return CategoryItem(
+                          category: category,
+                          categoryIcon: categoryIcon,
+                          isSelected: selectedCategory == category,
                           onTap: () {
                             setState(() {
                               selectedCategory = category;
                             });
                           },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 15),
-                            margin: const EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              color: selectedCategory == category
-                                  ? laranaPink
-                                  : Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 2,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  categoryIcon,
-                                  size: 20,
-                                  color: selectedCategory == category
-                                      ? Colors.white
-                                      : laranaPink,
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  category,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: selectedCategory == category
-                                        ? Colors.white
-                                        : laranaPink,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         );
                       },
-                    ),
-                  ),
-                ),
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 15, bottom: 0),
-                    child: Text(
-                      "P r o d u c t s",
-                      style: TextStyle(
-                        fontFamily: 'Genty',
-                        fontSize: 23,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 242, 186, 186),
-                        shadows: [
-                          Shadow(
-                            color: Color.fromARGB(255, 238, 241, 204),
-                            offset: Offset(3, 2),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
@@ -258,6 +235,19 @@ class _UserProductsScreenState extends State<UserProductsScreen> {
       ),
     );
   }
+
+  final List<Map<String, dynamic>> categories = [
+    {"name": "All", "icon": Icons.category},
+    {"name": "Lipsticks", "icon": Icons.face},
+    {"name": "Lip Glosses", "icon": Icons.face_retouching_natural},
+    {"name": "Blushes", "icon": Icons.brush},
+    {"name": "Foundations", "icon": Icons.format_paint},
+    {"name": "Concealers", "icon": Icons.blur_on},
+    {"name": "Powders", "icon": Icons.cloud},
+    {"name": "Eyeshadows", "icon": Icons.visibility},
+    {"name": "Eyeliners", "icon": Icons.edit},
+    {"name": "Mascaras", "icon": Icons.remove_red_eye},
+  ];
 }
 
 class UserProductList extends StatelessWidget {
@@ -280,12 +270,10 @@ class UserProductList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ProductsManager>(
       builder: (ctx, productsManager, child) {
-        // First apply favorite filter if needed
         final baseProducts = showFavorites
             ? productsManager.favoriteItems
             : productsManager.items;
 
-        // Then apply search and category filters
         final filteredProducts = baseProducts.where((product) {
           final matchesSearch =
               product.title.toLowerCase().contains(searchQuery);
@@ -337,7 +325,7 @@ class ProductFilterMenu extends StatelessWidget {
       onSelected: onFilterSelected,
       icon: const Icon(
         Icons.more_vert,
-        color: laranaPink, // Đổi từ màu xanh sang laranaPink
+        color: laranaPink,
       ),
       itemBuilder: (ctx) => [
         const PopupMenuItem(
@@ -367,12 +355,116 @@ class ShoppingCartButton extends StatelessWidget {
             count: cartManager.productCount,
             child: const Icon(
               Icons.shopping_cart,
-              color: laranaPink, // Đổi từ màu xanh sang laranaPink
+              color: laranaPink,
             ),
           ),
           onPressed: onPressed,
         );
       },
+    );
+  }
+}
+
+class CategoryItem extends StatefulWidget {
+  final String category;
+  final IconData categoryIcon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const CategoryItem({
+    super.key,
+    required this.category,
+    required this.categoryIcon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<CategoryItem> createState() => _CategoryItemState();
+}
+
+class _CategoryItemState extends State<CategoryItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _translateAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _translateAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, -0.02),
+    ).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animate() {
+    _controller.forward().then((_) {
+      _controller.reverse();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _animate();
+        widget.onTap();
+      },
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return SlideTransition(
+            position: _translateAnimation,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 7, horizontal: 15), // Giảm từ 6 xuống 4
+              margin: const EdgeInsets.symmetric(
+                  horizontal: 5, vertical: 5), // Thêm margin vertical
+              decoration: BoxDecoration(
+                color: widget.isSelected ? laranaPink : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 2,
+                    offset: Offset(0, 1),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    widget.categoryIcon,
+                    size: 20,
+                    color: widget.isSelected ? Colors.white : laranaPink,
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    widget.category,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: widget.isSelected ? Colors.white : laranaPink,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
