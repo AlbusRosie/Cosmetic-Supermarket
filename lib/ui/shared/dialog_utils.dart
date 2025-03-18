@@ -5,19 +5,19 @@ Future<bool?> showConfirmDialog(BuildContext context, String message) {
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor:
-          const Color.fromARGB(255, 255, 245, 245), // Màu nền hồng nhạt
+          const Color.fromARGB(255, 255, 245, 245),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16), // Bo tròn viền
+        borderRadius: BorderRadius.circular(16), 
       ),
       icon: const Icon(
         Icons.warning,
-        color: Color.fromARGB(255, 255, 71, 105), // Màu hồng đậm
+        color: Color.fromARGB(255, 255, 71, 105), 
         size: 32,
       ),
       title: const Text(
         'Are you sure?',
         style: TextStyle(
-          color: Color.fromARGB(255, 255, 105, 133), // Màu hồng đậm
+          color: Color.fromARGB(255, 255, 105, 133),
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -42,11 +42,11 @@ Future<bool?> showConfirmDialog(BuildContext context, String message) {
                 },
               ),
             ),
-            const SizedBox(width: 8), // Khoảng cách giữa hai nút
+            const SizedBox(width: 8),
             Expanded(
               child: ActionButton(
                 actionText: 'Yes',
-                buttonColor:const Color.fromARGB(255, 250, 118, 142), // Màu hồng đậm
+                buttonColor:const Color.fromARGB(255, 250, 118, 142),
                 textColor: Colors.white,
                 onPressed: () {
                   Navigator.of(ctx).pop(true);
@@ -83,10 +83,10 @@ class ActionButton extends StatelessWidget {
             buttonColor ?? const Color.fromARGB(255, 255, 40, 79),
         foregroundColor: textColor ?? Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25), // Bo tròn nút
+          borderRadius: BorderRadius.circular(25), 
         ),
         padding: const EdgeInsets.symmetric(vertical: 10),
-        elevation: 2, // Đổ bóng nhẹ
+        elevation: 2, 
       ),
       child: Text(
         actionText ?? 'Okay',
@@ -105,9 +105,9 @@ Future<void> showErrorDialog(BuildContext context, String message) {
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor:
-          const Color.fromARGB(255, 255, 245, 245), // Màu nền hồng nhạt
+          const Color.fromARGB(255, 255, 245, 245),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16), // Bo tròn viền
+        borderRadius: BorderRadius.circular(16),
       ),
       icon: const Icon(
         Icons.error,
@@ -130,7 +130,7 @@ Future<void> showErrorDialog(BuildContext context, String message) {
       ),
       actions: <Widget>[
         Container(
-          width: double.infinity, // Nút chiếm toàn bộ chiều rộng
+          width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ActionButton(
             actionText: 'Close',

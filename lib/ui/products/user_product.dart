@@ -20,8 +20,8 @@ class UserProduct extends StatefulWidget {
 class _UserProduct extends State<UserProduct>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation; // Sửa từ late_animation thành late
-  late Animation<double> _opacityAnimation; // Sửa từ late_animation thành late
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
   @override
   void initState() {
     super.initState();
@@ -73,7 +73,7 @@ class _UserProduct extends State<UserProduct>
           return Opacity(
             opacity: _opacityAnimation.value,
             child: Transform.scale(
-              scale: 1.0 - (_controller.value * 0.05), // Thu nhỏ tối đa 5%
+              scale: 1.0 - (_controller.value * 0.05),
               child: Card(
                 elevation: 3,
                 shape: RoundedRectangleBorder(

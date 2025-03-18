@@ -57,21 +57,17 @@ class OrdersManager with ChangeNotifier {
     if (index != -1) {
       final updatedOrder = _orders[index].copyWith(status: newStatus);
       print(
-          'Updating order status: ${updatedOrder.toJson()}'); // In dữ liệu đơn hàng trước khi cập nhật
+          'Updating order status: ${updatedOrder.toJson()}');
 
       final result = await _ordersService.updateOrder(updatedOrder);
       if (result != null) {
         _orders[index] = result;
         notifyListeners();
-        print(
-            'Order status updated successfully: ${result.toJson()}'); // In dữ liệu đơn hàng sau khi cập nhật
       } else {
-        print(
-            'Failed to update order status'); // In thông báo nếu cập nhật thất bại
+        print('Failed to update order status');
       }
     } else {
-      print(
-          'Order not found with ID: $orderId'); // In thông báo nếu không tìm thấy đơn hàng
+    print('Order not found with ID: $orderId'); 
     }
   }
 

@@ -80,15 +80,14 @@ class _CartItemCardState extends State<CartItemCard> {
         context.read<CartManager>().clearItem(widget.cartItem.id!);
       },
       child: Card(
-        color: const Color.fromARGB(255, 255, 235, 235), // Màu hồng nhạt
+        color: const Color.fromARGB(255, 255, 235, 235),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // Bo góc thẻ
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Ảnh sản phẩm
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
@@ -99,12 +98,10 @@ class _CartItemCardState extends State<CartItemCard> {
                 ),
               ),
               const SizedBox(width: 16),
-              // Thông tin sản phẩm
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Tên sản phẩm
                     Text(
                       widget.cartItem.title,
                       style: const TextStyle(
@@ -115,7 +112,6 @@ class _CartItemCardState extends State<CartItemCard> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    // Giá sản phẩm (màu hồng)
                     Text(
                       '$_quantity x '
                       '\$${widget.cartItem.price.toStringAsFixed(2)}',
@@ -126,11 +122,9 @@ class _CartItemCardState extends State<CartItemCard> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    // Số lượng và tổng giá
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Nút tăng/giảm số lượng
                         Container(
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -161,7 +155,6 @@ class _CartItemCardState extends State<CartItemCard> {
                             ],
                           ),
                         ),
-                        // Tổng giá tiền
                         Text(
                           '\$${(widget.cartItem.price * _quantity).toStringAsFixed(2)}',
                           style: const TextStyle(

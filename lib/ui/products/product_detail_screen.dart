@@ -99,17 +99,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color.fromARGB(255, 255, 105, 133), // Màu hồng đậm
-      secondary: const Color(0xFFFFF8DC), // Màu kem cho nút
+      seedColor: const Color.fromARGB(255, 255, 105, 133), 
+      secondary: const Color(0xFFFFF8DC),
       surface:
-          const Color.fromARGB(255, 255, 235, 235), // Màu hồng pastel cho nền
+          const Color.fromARGB(255, 255, 235, 235),
       surfaceTint: const Color.fromARGB(255, 255, 153, 153),
       primary: const Color.fromARGB(255, 255, 153, 153),
       onPrimary: Colors.white,
       onSecondary: Colors.black,
       onSurface: Colors.black,
     );
-    final priceColor = const Color.fromARGB(255, 255, 105, 133); // Hot pink
+    final priceColor = const Color.fromARGB(255, 255, 105, 133);
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -138,7 +138,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
           ],
         ),
-        backgroundColor: colorScheme.surface, // Nền màu hồng pastel
+        backgroundColor: colorScheme.surface,
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +148,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: AspectRatio(
-                    aspectRatio: 1, // Tỷ lệ 1:1 để tạo hình vuông
+                    aspectRatio: 1,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16),
                       child: Container(
@@ -181,17 +181,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Container(
                 padding: const EdgeInsets.only(top: 12),
                 child: Card(
-                  elevation: 0, // Không có đổ bóng
+                  elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // Bo góc
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  color: const Color.fromARGB(255, 255, 225, 225), // Màu nền
+                  color: const Color.fromARGB(255, 255, 225, 225),
                   child: Container(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tên sản phẩm
                         Text(
                           widget.product.title,
                           style: const TextStyle(
@@ -201,13 +200,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
 
                         const SizedBox(height: 8),
-
-                        // Giá và đánh giá nằm ngang
                         Row(
                           children: [
-                            // Đánh giá sản phẩm (bên trái)
                             Expanded(
-                              flex: 2, // Chiếm 2 phần không gian
+                              flex: 2,
                               child: Row(
                                 children: [
                                   Icon(Icons.star,
@@ -231,26 +227,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ],
                               ),
                             ),
-
-                            // Giá sản phẩm (bên phải)
                             Expanded(
-                              flex: 1, // Chiếm 1 phần không gian
+                              flex: 1,
                               child: Text(
                                 '\$${widget.product.price}',
                                 style: TextStyle(
                                   fontSize: 30,
                                   fontWeight: FontWeight.bold,
-                                  color: priceColor, // Màu giá
+                                  color: priceColor,
                                 ),
-                                textAlign: TextAlign.end, // Căn phải
+                                textAlign: TextAlign.end,
                               ),
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 16),
-
-                        // Mô tả sản phẩm
                         ExpansionTile(
                           title: Text(
                             'Description',
@@ -275,8 +267,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
 
                         const SizedBox(height: 16),
-
-                        // Phần nhập số lượng
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           child: Row(
@@ -330,11 +320,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         ),
 
                         const SizedBox(height: 16),
-
-                        // Nút yêu thích và nút Add to Cart
                         Row(
                           children: [
-                            // Nút yêu thích
                             Expanded(
                               flex: 1,
                               child: ElevatedButton.icon(
@@ -363,14 +350,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ),
                             ),
 
-                            const SizedBox(
-                                width: 12), // Khoảng cách giữa hai nút
-
-                            // Nút Add to Cart
+                            const SizedBox(width: 12),
                             Expanded(
                               flex:
-                                  2, // Để nút Add to Cart chiếm nhiều không gian hơn
-                              child: ElevatedButton.icon(
+                                  2,
+                                  child: ElevatedButton.icon(
                                 onPressed: () {
                                   final cart = context.read<CartManager>();
                                   cart.addItem(widget.product,

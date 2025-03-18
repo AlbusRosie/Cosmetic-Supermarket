@@ -429,9 +429,9 @@ class _CategoryItemState extends State<CategoryItem>
             position: _translateAnimation,
             child: Container(
               padding: const EdgeInsets.symmetric(
-                  vertical: 7, horizontal: 15), // Giảm từ 6 xuống 4
+                  vertical: 7, horizontal: 15),
               margin: const EdgeInsets.symmetric(
-                  horizontal: 5, vertical: 5), // Thêm margin vertical
+                  horizontal: 5, vertical: 5),
               decoration: BoxDecoration(
                 color: widget.isSelected ? laranaPink : Colors.white,
                 borderRadius: BorderRadius.circular(10),

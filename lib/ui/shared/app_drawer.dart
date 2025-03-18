@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../orders/orders_screen.dart';
 import '../cart/cart_screen.dart';
 
-const Color laranaPink = Color.fromARGB(255, 255, 158, 158); // Màu hồng chính
-const Color laranaPinkLight = Color(0xFFFFF0F0); // Màu hồng nhạt
+const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
+const Color laranaPinkLight = Color(0xFFFFF0F0);
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -46,7 +46,6 @@ class _AppDrawerState extends State<AppDrawer>
       ),
       child: Column(
         children: <Widget>[
-          // Header dễ thương với gradient và avatar động
           Container(
             height: 180,
             width: double.infinity,
@@ -81,7 +80,7 @@ class _AppDrawerState extends State<AppDrawer>
                       fontWeight: FontWeight.bold,
                       color: laranaPink,
                       fontFamily:
-                          'Pacifico', // Font dễ thương, cần thêm Google Fonts
+                          'Pacifico',
                       shadows: [
                         Shadow(
                           color: Colors.black12,
@@ -96,7 +95,6 @@ class _AppDrawerState extends State<AppDrawer>
             ),
           ),
           const SizedBox(height: 15),
-          // Các mục menu
           _buildMenuItem(
             context: context,
             icon: Icons.shop,
@@ -175,7 +173,7 @@ class _AppDrawerState extends State<AppDrawer>
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: laranaPink,
-              fontFamily: 'Pacifico', // Font dễ thương
+              fontFamily: 'Pacifico',
             ),
           ),
           tileColor: laranaPinkLight,

@@ -3,9 +3,9 @@ import 'package:provider/provider.dart';
 import '../shared/app_drawer.dart';
 import 'orders_manager.dart';
 import '../orders/order_item_cart.dart';
-const Color primaryColor = Color.fromARGB(255, 231, 110, 110); // Hồng đậm
-const Color secondaryColor = Color(0xFFFFDDE1); // Hồng nhạt thay cho vàng
-const Color backgroundColor = Color(0xFFFAFAFA); // Giữ nguyên màu nền
+const Color primaryColor = Color.fromARGB(255, 231, 110, 110);
+const Color secondaryColor = Color(0xFFFFDDE1); 
+const Color backgroundColor = Color(0xFFFAFAFA); 
 
 class OrdersScreen extends StatefulWidget {
   static const routeName = '/orders';
@@ -68,7 +68,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // Widget hiển thị khi có lỗi
   Widget _buildErrorWidget(Object? error, Color primaryColor) {
     return Center(
       child: Column(
@@ -98,7 +97,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // Widget hiển thị khi không có đơn hàng
   Widget _buildEmptyOrders(Color primaryColor) {
     return Center(
       child: Column(
@@ -128,7 +126,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // Widget danh sách đơn hàng
   Widget _buildOrderList(OrdersManager ordersManager) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),

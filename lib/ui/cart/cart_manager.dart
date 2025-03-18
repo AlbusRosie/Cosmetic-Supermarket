@@ -116,26 +116,10 @@ class CartManager with ChangeNotifier {
   }
 
   Future<void> updateItemQuantity(String itemId, int newQuantity) async {
-    // Thêm debug log
-    print(
-        "📝 updateItemQuantity được gọi với itemId: $itemId, newQuantity: $newQuantity");
-    print("📦 Danh sách keys trong _items: ${_items.keys.toList()}");
-
     if (_items.containsKey(itemId)) {
-      print("✅ Tìm thấy cart item với ID: $itemId");
       final updatedItem = _items[itemId]!.copyWith(quantity: newQuantity);
-      print(
-          "📤 Đang gửi yêu cầu cập nhật đến PocketBase với ID: ${updatedItem.id}, quantity: ${updatedItem.quantity}");
-
-      final success = await _cartsService.updateCartItem(updatedItem);
-
-      if (success != null) {
-        print("✅ Cập nhật thành công trên PocketBase");
-        _items[itemId] = updatedItem;
-        notifyListeners();
-      } else {
-        print("❌ Cập nhật thất bại trên PocketBase");
-      }
+      _items[itemId] = updatedItem;
+      notifyListeners();
     } else {
       print("❌ Không tìm thấy cart item với ID: $itemId trong _items");
     }

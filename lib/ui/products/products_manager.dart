@@ -28,7 +28,6 @@ class ProductsManager with ChangeNotifier {
   Future<void> updateProduct(Product product) async {
     final index = _items.indexWhere((item) => item.pid == product.pid);
     if (index >= 0) {
-      //_items[index] = product;
       final updatedProduct = await _productsService.updateProduct(product);
       if (updatedProduct != null) {
         _items[index] = updatedProduct;

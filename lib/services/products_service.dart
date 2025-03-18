@@ -28,7 +28,7 @@ class ProductsService {
       }
       return products;
     } catch (error) {
-      print('Error fetching products: $error'); // Thêm log lỗi
+      print('Error fetching products: $error');
       return products;
     }
   }
