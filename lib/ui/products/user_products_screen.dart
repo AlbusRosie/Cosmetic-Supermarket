@@ -1,7 +1,7 @@
 import 'products_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'user_product_list_tile.dart';
+import 'user_product.dart';
 import 'products_manager.dart';
 import '../cart/cart_screen.dart';
 import '../shared/app_drawer.dart';
@@ -299,7 +299,7 @@ class UserProductList extends StatelessWidget {
             childAspectRatio: 0.75,
           ),
           itemCount: productsToShow.length,
-          itemBuilder: (ctx, i) => UserProductListTile(
+          itemBuilder: (ctx, i) => UserProduct(
             productsToShow[i],
           ),
         );
