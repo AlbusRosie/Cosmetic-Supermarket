@@ -28,14 +28,22 @@ class User {
       avatar: avatar ?? this.avatar,
     );
   }
-
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'email': email,
+      'name': name,
+      'username': username,
+      'avatar': avatar,
+    };
+  }
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      username: json['username'],
-      email: json['email'] ?? '',
-      name: json['name'] ?? '',
-      avatar: json['avatar'] ?? '',
+      id: json['id'] as String,
+      email: json['email'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      username: json['username'] as String? ?? '',
+      avatar: json['avatar'] as String? ?? '',
     );
-  }
+  } 
 }

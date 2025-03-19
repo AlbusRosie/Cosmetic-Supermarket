@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../orders/orders_screen.dart';
 import '../cart/cart_screen.dart';
+import '../user/edit_user_screen.dart';
+import 'package:provider/provider.dart';
+import '../user/users_manager.dart';
+import '../auth/auth_manager.dart';
 
 const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
 const Color laranaPinkLight = Color(0xFFFFF0F0);
@@ -74,13 +78,12 @@ class _AppDrawerState extends State<AppDrawer>
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Hello Cutie!',
+                    'Hello Friend!',
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: laranaPink,
-                      fontFamily:
-                          'Pacifico',
+                      fontFamily: 'Pacifico',
                       shadows: [
                         Shadow(
                           color: Colors.black12,
@@ -115,8 +118,33 @@ class _AppDrawerState extends State<AppDrawer>
             title: 'Cart',
             route: CartScreen.routeName,
           ),
+          _buildDivider(),
+          _buildMenuItem(
+            context: context,
+            icon: Icons.person,
+            title: 'Edit User',
+            route: EditUserScreen.routeName,
+          ),
+          _buildDivider(),
+          _buildMenuItem(
+            context: context,
+            icon: Icons.exit_to_app,
+            title: 'Logout',
+            route: '/',
+            onTap: () async {
+              try {
+                await Provider.of<AuthManager>(context, listen: false).logout();
+                Navigator.of(context)
+                  ..pop() // Đóng Drawer
+                  ..pushReplacementNamed('/'); // Về màn hình chính
+              } catch (error) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout failed: $error')),
+                );
+              }
+            },
+          ),
           const Spacer(),
-          // Footer siêu xinh
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -156,6 +184,7 @@ class _AppDrawerState extends State<AppDrawer>
     required IconData icon,
     required String title,
     required String route,
+    VoidCallback? onTap, // Thêm tham số onTap tùy chỉnh
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -180,9 +209,14 @@ class _AppDrawerState extends State<AppDrawer>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          onTap: () {
-            Navigator.of(context).pushReplacementNamed(route);
-          },
+          onTap: onTap ??
+              () {
+                Navigator.of(context).pushReplacementNamed(
+                  route,
+                  arguments: Provider.of<UsersManager>(context, listen: false)
+                      .currentUser,
+                );
+              },
           hoverColor: laranaPink.withOpacity(0.2),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
