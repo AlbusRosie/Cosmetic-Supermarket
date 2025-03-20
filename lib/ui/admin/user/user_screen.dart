@@ -104,7 +104,7 @@ class _UsersScreenState extends State<UsersScreen> {
                         if (_searchQuery.isNotEmpty) {
                           customers = customers.where((user) {
                             final username = user.username.toLowerCase();
-                            final email = (user.email ?? '').toLowerCase();
+                            final email = (user.email).toLowerCase();
                             final phone = (user.phone)
                                 .toLowerCase(); // Thêm tìm kiếm theo phone
                             return username.contains(_searchQuery) ||
