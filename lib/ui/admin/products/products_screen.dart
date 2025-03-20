@@ -20,8 +20,7 @@ class _ProductScreenState extends State<ProductsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController =
-      TextEditingController(); 
+  final TextEditingController _searchController = TextEditingController(); 
   String _searchQuery = ''; 
 
   @override
