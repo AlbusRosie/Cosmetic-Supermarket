@@ -187,7 +187,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             subtitle: Text(
-                                              customers[i].email ?? 'No email',
+                                              customers[i].email,
                                               style: TextStyle(color: color4),
                                             ),
                                           ),
@@ -264,7 +264,7 @@ class _UsersScreenState extends State<UsersScreen> {
                             ),
                           ),
                           Text(
-                            user.email ?? 'No email',
+                            user.email,
                             style: TextStyle(color: color4),
                           ),
                         ],
