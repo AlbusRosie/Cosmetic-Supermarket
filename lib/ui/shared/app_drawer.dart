@@ -120,14 +120,15 @@ class _AppDrawerState extends State<AppDrawer>
                                     errorBuilder:
                                         (context, error, stackTrace) =>
                                             const Icon(
-                                      Icons.person,
+                                      Icons
+                                          .favorite, // Use the original icon as fallback
                                       size: 50,
                                       color: laranaPink,
                                     ),
                                   ),
                                 )
                               : const Icon(
-                                  Icons.person,
+                                  Icons.favorite, // Original placeholder
                                   size: 50,
                                   color: laranaPink,
                                 ),
