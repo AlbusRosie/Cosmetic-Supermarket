@@ -33,7 +33,7 @@ class _AuthCardState extends State<AuthCard> {
     _formKey.currentState!.save();
     _isSubmitting.value = true;
 
-    print('✅ Auth data after save: $_authData'); // Thêm log để kiểm tra
+    print('✅ Auth data after save: $_authData');
 
     try {
       if (_authMode == AuthMode.login) {
