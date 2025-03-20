@@ -41,9 +41,9 @@ class AuthManager with ChangeNotifier {
     try {
       print('🔴 AuthManager: Starting signup process');
       await _authService.signup(username, email, phone, password);
-      print('🔴 AuthManager: Signup completed successfully');
+      print('✅ AuthManager: Signup completed successfully');
     } catch (error) {
-      print('🔴 Signup error in manager: $error');
+      print('❌ Signup error in manager: $error');
       rethrow;
     }
   }
@@ -61,8 +61,7 @@ class AuthManager with ChangeNotifier {
     print('🔴 Starting tryAutoLogin()');
     try {
       final user = await _authService.getUserFromStore();
-      print(
-          '🔴 getUserFromStore completed: user = ${user != null ? 'exists' : 'null'}');
+      print('✅ getUserFromStore completed: user = ${user != null ? 'exists' : 'null'}');
 
       if (user != null) {
         _loggedInUser = user;
@@ -71,9 +70,9 @@ class AuthManager with ChangeNotifier {
         _loggedInUser = null;
         notifyListeners();
       }
-      print('🔴 tryAutoLogin completed successfully');
+      print('✅ tryAutoLogin completed successfully');
     } catch (error) {
-      print('🔴 Auto login error: $error');
+      print('❌ Auto login error: $error');
       _loggedInUser = null;
       notifyListeners();
     }

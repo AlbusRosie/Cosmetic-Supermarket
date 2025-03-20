@@ -37,13 +37,21 @@ class AuthService {
 
     try {
       // Check if the phone number already exists
-      final existingUsers = await pb.collection('users').getList(
+      final existingPhoneUsers = await pb.collection('users').getList(
             filter: 'phone = "$phone"',
           );
-
-      if (existingUsers.items.isNotEmpty) {
+      if (existingPhoneUsers.items.isNotEmpty) {
         throw Exception(
-            "Phone number already exists! Please use a different one.");
+            "This phone number is already in use. Please use a different one.");
+      }
+
+      // Check if the email already exists
+      final existingEmailUsers = await pb.collection('users').getList(
+            filter: 'email = "$email"',
+          );
+      if (existingEmailUsers.items.isNotEmpty) {
+        throw Exception(
+            "This email is already registered. Please use a different one.");
       }
 
       print('Creating user: $email');
@@ -54,12 +62,12 @@ class AuthService {
         'phone': phone,
         'password': password,
         'passwordConfirm': password,
-        'urole': 'customer', // Default role
+        'urole': 'customer',
+        'emailVisibility': true, 
       });
 
       print('PocketBase response: ${record.toJson()}');
 
-      // Add email to the returned data
       Map<String, dynamic> userData = record.toJson();
       userData['email'] = email;
 
@@ -71,7 +79,7 @@ class AuthService {
         final errorMessage = error.response['message'] ?? 'Registration failed';
         throw Exception(errorMessage);
       }
-      throw Exception('An error occurred during registration');
+      throw Exception(error.toString());
     }
   }
 

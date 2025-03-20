@@ -33,6 +33,8 @@ class _AuthCardState extends State<AuthCard> {
     _formKey.currentState!.save();
     _isSubmitting.value = true;
 
+    print('✅ Auth data after save: $_authData'); // Thêm log để kiểm tra
+
     try {
       if (_authMode == AuthMode.login) {
         await context.read<AuthManager>().login(
@@ -73,7 +75,7 @@ class _AuthCardState extends State<AuthCard> {
           padding: const EdgeInsets.only(top: 0.0),
           child: Container(
             width: double.infinity,
-            height: size.height * 0.675, // Adjust height to fill the bottom
+            height: size.height * 0.75,
             decoration: const BoxDecoration(
               color: color17,
               borderRadius: BorderRadius.only(
@@ -110,7 +112,6 @@ class _AuthCardState extends State<AuthCard> {
                           _buildUsernameField(),
                           _buildPhoneField(),
                         ],
-                        
                         _buildPasswordField(),
                         if (_authMode == AuthMode.signup) ...[
                           _buildPasswordConfirmField(),
@@ -140,6 +141,13 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Username",
       icon: Icons.person,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Username cannot be blank!';
+        }
+        return null;
+      },
+      onSaved: (value) => _authData['username'] = value!, 
     );
   }
 
@@ -147,6 +155,12 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Phone",
       icon: Icons.phone,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Phone cannot be blank!';
+        }
+        return null;
+      },
       onSaved: (value) => _authData['phone'] = value!,
     );
   }
@@ -155,8 +169,12 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Email",
       icon: Icons.email,
-      validator: (value) =>
-          value!.isEmpty || !value.contains('@') ? 'Invalid email!' : null,
+      validator: (value) {
+        if (value == null || value.isEmpty || !value.contains('@')) {
+          return 'Invalid email!';
+        }
+        return null;
+      },
       onSaved: (value) => _authData['email'] = value!,
     );
   }
@@ -167,8 +185,12 @@ class _AuthCardState extends State<AuthCard> {
       icon: Icons.lock,
       obscureText: true,
       controller: _passwordController,
-      validator: (value) =>
-          value != null && value.length < 5 ? 'Password is too short!' : null,
+      validator: (value) {
+        if (value == null || value.length < 5) {
+          return 'Password is too short!';
+        }
+        return null;
+      },
       onSaved: (value) => _authData['password'] = value!,
     );
   }
@@ -178,15 +200,18 @@ class _AuthCardState extends State<AuthCard> {
       hintText: "Confirm Password",
       icon: Icons.lock_reset,
       obscureText: true,
-      validator: (value) =>
-          value != _passwordController.text ? 'Passwords do not match!' : null,
+      validator: (value) {
+        if (value != _passwordController.text) {
+          return 'Passwords do not match!';
+        }
+        return null;
+      },
     );
   }
 
   Widget _buildAuthModeSwitchButton() {
     return Row(
-      mainAxisAlignment:
-          MainAxisAlignment.center, 
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           _authMode == AuthMode.login
@@ -265,7 +290,6 @@ class _AuthCardState extends State<AuthCard> {
   }
 }
 
-/// `TextFieldContainer` creates a container for the input field with a white background and gray border.
 class TextFieldContainer extends StatelessWidget {
   final Widget child;
   const TextFieldContainer({
@@ -285,7 +309,7 @@ class TextFieldContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: color4, width: 1.5),
       ),
-      child: child,
+      child: child
     );
   }
 }
