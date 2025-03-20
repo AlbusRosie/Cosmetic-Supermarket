@@ -6,7 +6,7 @@ import '../cart/cart_manager.dart';
 import 'product_detail_screen.dart';
 
 const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
-const Color laranaPinkLight = Color(0xFFFFF0F0);
+const Color laranaPinkLight = Color(0xFFFF0F0);
 
 class UserProduct extends StatefulWidget {
   final Product product;
@@ -22,6 +22,8 @@ class _UserProduct extends State<UserProduct>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
+  bool _isAddingToCart = false; // Track loading state
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +63,75 @@ class _UserProduct extends State<UserProduct>
         _controller.reverse();
       });
     });
+  }
+
+  void _handleAddToCart() async {
+    _animateAddToCart();
+    final cart = context.read<CartManager>();
+
+    // Step 1: Check if stockQuantity is 0
+    if (widget.product.stockQuantity <= 0) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+                'Product is out of stock. Current stock quantity: ${widget.product.stockQuantity}'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      return;
+    }
+
+    // Step 2: Add item to cart and handle potential errors
+    setState(() {
+      _isAddingToCart = true; // Show loading indicator
+    });
+
+    try {
+      await cart.addItem(widget.product);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: const Text('Item added to cart'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: laranaPink,
+            action: SnackBarAction(
+              label: 'UNDO',
+              textColor: Colors.white,
+              onPressed: () {
+                cart.removeItem(widget.product.pid!);
+              },
+            ),
+          ),
+        );
+    } catch (error) {
+      // Standardize the error message
+      String errorMessage = error.toString();
+      if (errorMessage.contains('Product is out of stock')) {
+        // Already in the correct format
+      } else if (errorMessage.contains('Failed to add product to cart')) {
+        errorMessage = 'Unable to add item to cart. Please try again.';
+      } else {
+        errorMessage = 'An error occurred. Please try again later.';
+      }
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+    } finally {
+      setState(() {
+        _isAddingToCart = false; // Hide loading indicator
+      });
+    }
   }
 
   @override
@@ -209,52 +280,39 @@ class _UserProduct extends State<UserProduct>
                                   ScaleTransition(
                                     scale: _scaleAnimation,
                                     child: IconButton(
-                                      onPressed: () {
-                                        _animateAddToCart();
-                                        final cart =
-                                            context.read<CartManager>();
-                                        cart.addItem(widget.product);
-                                        ScaffoldMessenger.of(context)
-                                          ..hideCurrentSnackBar()
-                                          ..showSnackBar(
-                                            SnackBar(
-                                              content: const Text(
-                                                  'Item added to cart'),
-                                              duration:
-                                                  const Duration(seconds: 2),
-                                              backgroundColor: laranaPink,
-                                              action: SnackBarAction(
-                                                label: 'UNDO',
-                                                textColor: Colors.white,
-                                                onPressed: () {
-                                                  cart.removeItem(
-                                                      widget.product.pid!);
-                                                },
+                                      onPressed: _isAddingToCart
+                                          ? null
+                                          : _handleAddToCart, // Disable button while loading
+                                      icon: _isAddingToCart
+                                          ? SizedBox(
+                                              width: 24,
+                                              height: 24,
+                                              child: CircularProgressIndicator(
+                                                color: laranaPink,
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : Container(
+                                              decoration: BoxDecoration(
+                                                color: const Color.fromARGB(
+                                                    0, 255, 255, 255),
+                                                borderRadius:
+                                                    BorderRadius.circular(15),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: laranaPink
+                                                        .withOpacity(0.3),
+                                                    blurRadius: 7,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: const Icon(
+                                                Icons.shopping_cart,
+                                                color: laranaPink,
+                                                size: 24,
                                               ),
                                             ),
-                                          );
-                                      },
-                                      icon: Container(
-                                        decoration: BoxDecoration(
-                                          color: const Color.fromARGB(
-                                              0, 255, 255, 255),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  laranaPink.withOpacity(0.3),
-                                              blurRadius: 7,
-                                              offset: const Offset(0, 2),
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Icon(
-                                          Icons.shopping_cart,
-                                          color: laranaPink,
-                                          size: 24,
-                                        ),
-                                      ),
                                     ),
                                   ),
                                 ],

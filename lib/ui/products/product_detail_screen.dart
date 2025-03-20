@@ -5,6 +5,7 @@ import '../../models/product.dart';
 import '../cart/cart_screen.dart';
 import '../products/user_products_screen.dart';
 import '../cart/cart_manager.dart';
+
 class ProductDetailScreen extends StatefulWidget {
   static const routeName = '/product_detail';
   const ProductDetailScreen(
@@ -21,6 +22,7 @@ class ProductDetailScreen extends StatefulWidget {
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   late bool _isFavorite;
   int _quantity = 1;
+  bool _isAddingToCart = false; // Track loading state for Add to Cart
 
   @override
   void initState() {
@@ -29,6 +31,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   }
 
   void _incrementQuantity() {
+    // Check if the new quantity exceeds stockQuantity
+    if (_quantity + 1 > widget.product.stockQuantity) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+                'Product is out of stock. Current stock quantity: ${widget.product.stockQuantity}'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+      return;
+    }
+
     setState(() {
       _quantity++;
     });
@@ -96,13 +113,63 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
+  Future<void> _handleAddToCart() async {
+    if (_isAddingToCart) return; // Prevent multiple clicks
+
+    setState(() {
+      _isAddingToCart = true; // Show loading state
+    });
+
+    final cart = context.read<CartManager>();
+    try {
+      // Check if stockQuantity is 0
+      if (widget.product.stockQuantity <= 0) {
+        throw Exception(
+            'Product is out of stock. Current stock quantity: ${widget.product.stockQuantity}');
+      }
+
+      await cart.addItem(widget.product, quantity: _quantity);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Added $_quantity x ${widget.product.title} to cart'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: const Color.fromARGB(255, 255, 153, 153),
+          ),
+        );
+    } catch (error) {
+      String errorMessage = error.toString();
+      if (errorMessage.contains('Product is out of stock')) {
+        // Already in the correct format
+      } else if (errorMessage.contains('Failed to add product to cart')) {
+        errorMessage = 'Unable to add item to cart. Please try again.';
+      } else {
+        errorMessage = 'An error occurred. Please try again later.';
+      }
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+    } finally {
+      setState(() {
+        _isAddingToCart = false; // Hide loading state
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: const Color.fromARGB(255, 255, 105, 133), 
+      seedColor: const Color.fromARGB(255, 255, 105, 133),
       secondary: const Color(0xFFFFF8DC),
-      surface:
-          const Color.fromARGB(255, 255, 235, 235),
+      surface: const Color.fromARGB(255, 255, 235, 235),
       surfaceTint: const Color.fromARGB(255, 255, 153, 153),
       primary: const Color.fromARGB(255, 255, 153, 153),
       onPrimary: Colors.white,
@@ -119,7 +186,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          foregroundColor: Color.fromARGB(255, 255, 105, 133),
+          foregroundColor: const Color.fromARGB(255, 255, 105, 133),
           actions: [
             IconButton(
               icon: const Icon(Icons.home),
@@ -198,7 +265,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -206,15 +272,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               flex: 2,
                               child: Row(
                                 children: [
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Colors.amber, size: 20),
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Colors.amber, size: 20),
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Colors.amber, size: 20),
-                                  Icon(Icons.star,
+                                  const Icon(Icons.star,
                                       color: Colors.amber, size: 20),
-                                  Icon(Icons.star_half,
+                                  const Icon(Icons.star_half,
                                       color: Colors.amber, size: 20),
                                   const SizedBox(width: 8),
                                   Text(
@@ -241,7 +307,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 16),
                         ExpansionTile(
                           title: Text(
@@ -265,7 +330,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 16),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -318,7 +382,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 16),
                         Row(
                           children: [
@@ -349,33 +412,28 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 ),
                               ),
                             ),
-
                             const SizedBox(width: 12),
                             Expanded(
-                              flex:
-                                  2,
-                                  child: ElevatedButton.icon(
-                                onPressed: () {
-                                  final cart = context.read<CartManager>();
-                                  cart.addItem(widget.product,
-                                      quantity: _quantity);
-
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                            'Added $_quantity x ${widget.product.title} to cart'),
+                              flex: 2,
+                              child: ElevatedButton.icon(
+                                onPressed:
+                                    _isAddingToCart ? null : _handleAddToCart,
+                                label: _isAddingToCart
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Add To Cart',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    );
-                                },
-                                label: const Text(
-                                  'Add To Cart',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: colorScheme.primary,
                                   foregroundColor: colorScheme.onPrimary,

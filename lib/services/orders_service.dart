@@ -79,34 +79,121 @@ class OrdersService {
     try {
       final pb = await getPocketbaseInstance();
       final userId = pb.authStore.record?.id;
-      if (userId == null) {
-        return null;
+      final Map<String, int> productQuantities = {};
+      final Map<String, int> productStocks = {};
+      final List<CartItem> validCartItems = [];
+      final List<String> lockedProducts = [];
+
+      for (var cartItem in order.products) {
+        try {
+          final productRecord = await pb.collection('products').getOne(cartItem.productId);
+          final currentStock = productRecord.data['stockQuantity'] ?? 0;
+          final isLocked = productRecord.data['locked'] ?? false;
+          if (isLocked) {
+            throw Exception(
+                'Product ${cartItem.productId} is currently locked');
+          }
+          final requiredQuantity =
+              (productQuantities[cartItem.productId] ?? 0) + cartItem.quantity;
+          if (currentStock < requiredQuantity) {
+            throw Exception(
+                'Not enough stock for product ${cartItem.productId}. Available: $currentStock, Required: $requiredQuantity');
+          }
+          await pb.collection('products').update(
+            cartItem.productId,
+            body: {'locked': true},
+          );
+          lockedProducts.add(cartItem.productId);
+          validCartItems.add(cartItem);
+          productQuantities[cartItem.productId] = requiredQuantity;
+          productStocks[cartItem.productId] = currentStock;
+        } catch (e) {
+          continue;
+        }
+      }
+      if (validCartItems.isEmpty) {
+        for (var productId in lockedProducts) {
+          try {
+            await pb.collection('products').update(
+              productId,
+              body: {'locked': false},
+            );
+          } catch (e) {
+            print('Error unlocking product $productId: $e');
+          }
+        }
+        throw Exception('Cannot create order: No valid products found. Please check if the products still exist.');
       }
       final orderData = {
         'amount': order.amount,
         'dateTime': order.dateTime.toIso8601String(),
         'userId': userId,
-        'products': order.products
-            .map((p) => p.id)
-            .toList(),
+        'products': validCartItems.map((p) => p.id).toList(),
         'status': 'confirmed',
       };
-      final orderModel = await pb.collection('orders').create(
-            body: orderData,
+      final orderModel = await pb.collection('orders').create(body: orderData);
+      try {
+        for (var entry in productQuantities.entries) {
+          final productId = entry.key;
+          final totalQuantity = entry.value;
+          final currentStock = productStocks[productId]!;
+          final newStock = currentStock - totalQuantity;
+          await pb.collection('products').update(
+            productId,
+            body: {
+              'stockQuantity': newStock,
+              'locked': false,
+            },
           );
-      for (var cartItem in order.products) {
-        final cartRecords = await pb.collection('carts').getFullList(
-              filter:
-                  "userId='$userId' && productId='${cartItem.productId}' && status='pending'",
-            );
-        for (final cart in cartRecords) {
-          await pb.collection('carts')
-              .update(cart.id, body: {'status': 'checked_out'});
+          lockedProducts.remove(productId);
         }
+        for (var cartItem in validCartItems) {
+          final cartRecords = await pb.collection('carts').getFullList(
+                filter:"userId='$userId' && productId='${cartItem.productId}' && status='pending'",);
+          for (final cart in cartRecords) {
+            await pb.collection('carts').update(cart.id,body: {'status': 'checked_out'},);
+          }
+        }
+      } catch (error) {
+        try {
+          await pb.collection('orders').delete(orderModel.id);
+        } catch (e) {
+          print('Error rolling back order ${orderModel.id}: $e');
+        }
+        for (var productId in lockedProducts) {
+          try {
+            await pb.collection('products').update(
+              productId,
+              body: {'locked': false},
+            );
+          } catch (e) {
+            print('Error unlocking product $productId during rollback: $e');
+          }
+        }
+        throw error;
       }
       return order.copyWith(id: orderModel.id);
     } catch (error) {
-      return null;
+      throw Exception('Failed to add order: $error');
+    }
+  }
+  Future<void> cleanInvalidCartItems() async {
+    try {
+      final pb = await getPocketbaseInstance();
+      final cartItems = await pb.collection('carts').getFullList();
+      for (final cart in cartItems) {
+        final cartData = cart.toJson();
+        final productId = cartData['productId'];
+        try {
+          await pb.collection('products').getOne(productId);
+        } catch (e) {
+          print(
+              'Deleting cart item ${cart.id} with invalid productId $productId');
+          await pb.collection('carts').delete(cart.id);
+        }
+      }
+    } catch (error) {
+      print('Error cleaning invalid cart items: $error');
     }
   }
 }

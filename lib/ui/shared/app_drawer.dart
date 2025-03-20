@@ -20,6 +20,7 @@ class _AppDrawerState extends State<AppDrawer>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  bool _isLoadingUser = true; // Track loading state for user data
 
   @override
   void initState() {
@@ -32,6 +33,30 @@ class _AppDrawerState extends State<AppDrawer>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
     _controller.forward();
+
+    // Fetch user data when the drawer is opened
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    setState(() {
+      _isLoadingUser = true;
+    });
+    try {
+      await Provider.of<UsersManager>(context, listen: false).fetchUser();
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load user data: $error'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoadingUser = false;
+      });
+    }
   }
 
   @override
@@ -42,6 +67,9 @@ class _AppDrawerState extends State<AppDrawer>
 
   @override
   Widget build(BuildContext context) {
+    final userManager = Provider.of<UsersManager>(context);
+    final user = userManager.currentUser;
+
     return Drawer(
       backgroundColor: Colors.white,
       elevation: 5,
@@ -67,32 +95,72 @@ class _AppDrawerState extends State<AppDrawer>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircleAvatar(
-                    radius: 45,
-                    backgroundColor: laranaPink.withOpacity(0.2),
-                    child: const Icon(
-                      Icons.favorite,
-                      size: 50,
-                      color: laranaPink,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'Hello Friend!',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: laranaPink,
-                      fontFamily: 'Pacifico',
-                      shadows: [
-                        Shadow(
-                          color: Colors.black12,
-                          offset: Offset(1, 1),
-                          blurRadius: 2,
+                  _isLoadingUser
+                      ? const CircularProgressIndicator(
+                          color: laranaPink,
+                        )
+                      : CircleAvatar(
+                          radius: 45,
+                          backgroundColor: laranaPink.withOpacity(0.2),
+                          child: user?.avatar != null &&
+                                  user!.avatar!.isNotEmpty
+                              ? ClipOval(
+                                  child: Image.network(
+                                    user.avatar!,
+                                    width: 90,
+                                    height: 90,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const CircularProgressIndicator(
+                                        color: laranaPink,
+                                      );
+                                    },
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(
+                                      Icons.person,
+                                      size: 50,
+                                      color: laranaPink,
+                                    ),
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: laranaPink,
+                                ),
                         ),
-                      ],
-                    ),
-                  ),
+                  const SizedBox(height: 12),
+                  _isLoadingUser
+                      ? const Text(
+                          'Loading...',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: laranaPink,
+                            fontFamily: 'Pacifico',
+                          ),
+                        )
+                      : Text(
+                          user?.name != null && user!.name!.isNotEmpty
+                              ? 'Hello, ${user.name}!'
+                              : 'Hello, Friend!',
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                            color: laranaPink,
+                            fontFamily: 'Pacifico',
+                            shadows: [
+                              Shadow(
+                                color: Colors.black12,
+                                offset: Offset(1, 1),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -135,11 +203,15 @@ class _AppDrawerState extends State<AppDrawer>
               try {
                 await Provider.of<AuthManager>(context, listen: false).logout();
                 Navigator.of(context)
-                  ..pop() // Đóng Drawer
-                  ..pushReplacementNamed('/'); // Về màn hình chính
+                  ..pop() // Close Drawer
+                  ..pushReplacementNamed('/'); // Navigate to home screen
               } catch (error) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Logout failed: $error')),
+                  SnackBar(
+                    content: Text('Logout failed: $error'),
+                    backgroundColor: Colors.red,
+                    duration: const Duration(seconds: 3),
+                  ),
                 );
               }
             },
@@ -184,7 +256,7 @@ class _AppDrawerState extends State<AppDrawer>
     required IconData icon,
     required String title,
     required String route,
-    VoidCallback? onTap, // Thêm tham số onTap tùy chỉnh
+    VoidCallback? onTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),

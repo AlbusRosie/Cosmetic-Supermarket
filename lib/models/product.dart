@@ -9,6 +9,7 @@ class Product {
   final bool isFavorite;
   final int stockQuantity;
   final String category;
+  final bool locked;
 
   Product({
     this.pid,
@@ -20,6 +21,7 @@ class Product {
     this.isFavorite = false,
     required this.stockQuantity,
     required this.category,
+    this.locked = false,
   });
 
   Product copyWith({
@@ -32,6 +34,7 @@ class Product {
     bool? isFavorite,
     int? stockQuantity,
     String? category,
+    bool? locked,
   }) {
     return Product(
       pid: pid ?? this.pid,
@@ -43,6 +46,7 @@ class Product {
       isFavorite: isFavorite ?? this.isFavorite,
       stockQuantity: stockQuantity ?? this.stockQuantity,
       category: category ?? this.category,
+      locked: locked ?? this.locked,
     );
   }
 
@@ -58,6 +62,7 @@ class Product {
       'isFavorite': isFavorite,
       'stockQuantity':stockQuantity,
       'category': category,
+      'locked': locked,
     };
   }
 
@@ -71,6 +76,7 @@ class Product {
       imageUrl: json['imageUrl'] ?? '',
       stockQuantity: json['stockQuantity'] ?? 0,
       category: json['category'] ?? '',
+      locked: json['locked'] ?? false,
     );
   }
 }

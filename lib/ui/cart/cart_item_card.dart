@@ -20,6 +20,7 @@ class CartItemCard extends StatefulWidget {
 
 class _CartItemCardState extends State<CartItemCard> {
   late int _quantity;
+  bool _isUpdatingQuantity = false; // Track loading state
 
   @override
   void initState() {
@@ -27,25 +28,75 @@ class _CartItemCardState extends State<CartItemCard> {
     _quantity = widget.cartItem.quantity;
   }
 
-  void _incrementQuantity() {
+  Future<void> _incrementQuantity() async {
+    if (_isUpdatingQuantity) return; // Prevent multiple clicks
+
     setState(() {
+      _isUpdatingQuantity = true; // Show loading state
       _quantity++;
     });
-    context.read<CartManager>().updateItemQuantity(
-          widget.cartItem.id!,
-          _quantity,
-        );
-  }
 
-  void _decrementQuantity() {
-    if (_quantity > 1) {
+    try {
+      await context.read<CartManager>().updateItemQuantity(
+            widget.cartItem.productId, // Use productId, not id
+            _quantity,
+          );
+      // Success: Quantity updated
+    } catch (error) {
+      // Revert quantity on error
       setState(() {
         _quantity--;
       });
-      context.read<CartManager>().updateItemQuantity(
-            widget.cartItem.id!,
+      // Show error message
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('$error'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+    } finally {
+      setState(() {
+        _isUpdatingQuantity = false; // Hide loading state
+      });
+    }
+  }
+
+  Future<void> _decrementQuantity() async {
+    if (_quantity <= 1 || _isUpdatingQuantity) return;
+
+    setState(() {
+      _isUpdatingQuantity = true; // Show loading state
+      _quantity--;
+    });
+
+    try {
+      await context.read<CartManager>().updateItemQuantity(
+            widget.cartItem.productId, // Use productId, not id
             _quantity,
           );
+      // Success: Quantity updated
+    } catch (error) {
+      // Revert quantity on error
+      setState(() {
+        _quantity++;
+      });
+      // Show error message
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text('$error'),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+          ),
+        );
+    } finally {
+      setState(() {
+        _isUpdatingQuantity = false; // Hide loading state
+      });
     }
   }
 
@@ -115,10 +166,10 @@ class _CartItemCardState extends State<CartItemCard> {
                     Text(
                       '$_quantity x '
                       '\$${widget.cartItem.price.toStringAsFixed(2)}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 255, 105, 133),
+                        color: Color.fromARGB(255, 255, 105, 133),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -136,8 +187,17 @@ class _CartItemCardState extends State<CartItemCard> {
                           child: Row(
                             children: [
                               IconButton(
-                                icon:
-                                    const Icon(Icons.remove, color: Colors.red),
+                                icon: _isUpdatingQuantity
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.red,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.remove,
+                                        color: Colors.red),
                                 onPressed: _decrementQuantity,
                               ),
                               Text(
@@ -148,8 +208,17 @@ class _CartItemCardState extends State<CartItemCard> {
                                 ),
                               ),
                               IconButton(
-                                icon:
-                                    const Icon(Icons.add, color: Colors.green),
+                                icon: _isUpdatingQuantity
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.green,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.add,
+                                        color: Colors.green),
                                 onPressed: _incrementQuantity,
                               ),
                             ],

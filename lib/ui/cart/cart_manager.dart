@@ -37,33 +37,68 @@ class CartManager with ChangeNotifier {
   }
 
   Future<void> addItem(Product product, {int quantity = 1}) async {
-    if (_items.containsKey(product.pid!)) {
-      final updatedQuantity = _items[product.pid]!.quantity + quantity;
-      _items[product.pid!] =
-          _items[product.pid]!.copyWith(quantity: updatedQuantity);
-
-      await _cartsService.updateCartItem(_items[product.pid]!);
-    } else {
-      final newItem = CartItem(
-        productId: product.pid!,
-        title: product.title,
-        price: product.price,
-        quantity: quantity,
-        imageUrl: product.imageUrl,
-      );
-      final addedItem = await _cartsService.addCartItem(newItem);
-      if (addedItem != null) {
-        _items[product.pid!] = addedItem;
+    try {
+      // Step 1: Check the product's stockQuantity
+      if (product.stockQuantity <= 0) {
+        throw Exception('Product is out of stock.');
       }
+
+      // Step 2: Calculate the total quantity after adding
+      int currentQuantity =
+          _items.containsKey(product.pid!) ? _items[product.pid!]!.quantity : 0;
+      final totalQuantity = currentQuantity + quantity;
+
+      if (totalQuantity > product.stockQuantity) {
+        throw Exception(
+            'Product is out of stock. Current stock quantity: ${product.stockQuantity}');
+      }
+
+      // Step 3: Add or update the cart item
+      if (_items.containsKey(product.pid!)) {
+        final updatedQuantity = _items[product.pid!]!.quantity + quantity;
+        final updatedItem =
+            _items[product.pid!]!.copyWith(quantity: updatedQuantity);
+        await _cartsService.updateCartItem(updatedItem);
+        _items[product.pid!] = updatedItem;
+      } else {
+        final newItem = CartItem(
+          productId: product.pid!,
+          title: product.title,
+          price: product.price,
+          quantity: quantity,
+          imageUrl: product.imageUrl,
+        );
+        final addedItem = await _cartsService.addCartItem(newItem);
+        if (addedItem != null) {
+          _items[product.pid!] = addedItem;
+        } else {
+          throw Exception('Failed to add product to cart.');
+        }
+      }
+      notifyListeners();
+    } catch (error) {
+      throw error; // Throw the error for the UI to handle
     }
-    notifyListeners();
   }
 
   Future<void> updateItem(CartItem item) async {
-    final updatedItem = await _cartsService.updateCartItem(item);
-    if (updatedItem != null) {
-      _items[item.id!] = updatedItem;
-      notifyListeners();
+    try {
+      // Step 1: Check if the item exists in the cart
+      if (!_items.containsKey(item.productId)) {
+        throw Exception(
+            'Cart item with product ID ${item.productId} not found.');
+      }
+
+      // Step 2: Update the cart item via the service
+      final updatedItem = await _cartsService.updateCartItem(item);
+      if (updatedItem != null) {
+        _items[item.productId] = updatedItem; // Use productId as the key
+        notifyListeners();
+      } else {
+        throw Exception('Failed to update cart item.');
+      }
+    } catch (error) {
+      throw error; // Throw the error for the UI to handle
     }
   }
 
@@ -115,13 +150,23 @@ class CartManager with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateItemQuantity(String itemId, int newQuantity) async {
-    if (_items.containsKey(itemId)) {
-      final updatedItem = _items[itemId]!.copyWith(quantity: newQuantity);
-      _items[itemId] = updatedItem;
+  Future<void> updateItemQuantity(String productId, int newQuantity) async {
+    try {
+      if (!_items.containsKey(productId)) {
+        return;
+      }
+      final stockQuantity = await _cartsService.checkStockQuantity(productId);
+
+      if (newQuantity > stockQuantity) {
+        throw Exception(
+            'Product is out of stock. Current stock quantity: $stockQuantity');
+      }
+      final updatedItem = _items[productId]!.copyWith(quantity: newQuantity);
+      await _cartsService.updateCartItem(updatedItem);
+      _items[productId] = updatedItem;
       notifyListeners();
-    } else {
-      print("❌ Không tìm thấy cart item với ID: $itemId trong _items");
+    } catch (error) {
+      throw error; // Throw the error for the UI to handle
     }
   }
 }
