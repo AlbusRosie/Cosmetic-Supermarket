@@ -1,36 +1,33 @@
 import 'dart:convert';
 
-User userFromJson(String str) => User.fromMap(json.decode(str));
+Users userFromJson(String str) => Users.fromMap(json.decode(str));
 
-String userToJson(User data) => json.encode(data.toMap());
+String userToJson(Users data) => json.encode(data.toMap());
 
-class User {
+class Users {
   final int? uid;
-  final String urole;
-  final String uname;
-  final String? email;
-  final String? phone;
+  final String? urole;
+  final String? uname;
+  final String phone;
   final String password;
-  final String address;
+  final String? address;
   final String? avt; // Optional avatar field
 
-  User({
+  Users({
     this.uid,
-    required this.urole,
-    required this.uname,
-    this.email,
-    this.phone,
+    this.urole = "2",
+    this.uname,
+    required this.phone,
     required this.password,
-    required this.address,
+    this.address,
     this.avt,
   });
 
   // The json value must be the same as the column name in database
-  factory User.fromMap(Map<String, dynamic> json) => User(
+  factory Users.fromMap(Map<String, dynamic> json) => Users(
         uid: json["uid"], // Added uid
-        urole: json["urole"] ?? "customer", // Default to "customer"
+        urole: json["urole"] ?? "2", // Default to "customer"
         uname: json["uname"],
-        email: json["email"],
         phone: json["phone"],
         password: json["password"],
         address: json["address"],
@@ -41,7 +38,6 @@ class User {
         "uid": uid,
         "urole": urole,
         "uname": uname,
-        "email": email,
         "phone": phone,
         "password": password,
         "address": address,
