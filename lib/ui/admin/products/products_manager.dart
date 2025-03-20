@@ -56,7 +56,6 @@ Future<void> updateProduct(Product product) async {
     }
   }
 
-
   Future<void> deleteProduct(String pid) async {
     final index = _items.indexWhere((item) => item.pid == pid);
     if (index >= 0 && await _productsService.deleteProduct(pid)) {

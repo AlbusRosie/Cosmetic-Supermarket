@@ -37,7 +37,7 @@ class ProductsService {
         imageUrl: _getFeaturedImageUrl(pb, productModel),
       );
     } catch (error) {
-      print('🔴🔴🔴 Error adding product: $error');
+      print('❌ Error adding product: $error');
       return null;
     }
   }
@@ -67,7 +67,7 @@ class ProductsService {
       }
       return products;
     } catch (error) {
-      print('🔴🔴🔴 Error fetching products: $error');
+      print('❌ Error fetching products: $error');
       return products;
     }
   }
@@ -84,7 +84,7 @@ class ProductsService {
           .toList();
       return categories;
     } catch (error) {
-      print('🔴🔴🔴 Error fetching categories: $error');
+      print('❌ Error fetching categories: $error');
       return [];
     }
   }
@@ -114,7 +114,7 @@ class ProductsService {
             : product.imageUrl,
       );
     } catch (error) {
-      print('🔴🔴🔴 Error updating product: $error');
+      print('❌ Error updating product: $error');
       return null;
     }
   }
@@ -125,7 +125,7 @@ class ProductsService {
       await pb!.collection('products').delete(id);
       return true;
     } catch (error) {
-      print('🔴🔴🔴 Error deleting product: $error');
+      print('❌ Error deleting product: $error');
       return false;
     }
   }

@@ -5,7 +5,7 @@ import '../../../models/product.dart';
 import 'add_product.dart';
 import 'edit_product.dart';
 import 'products_manager.dart';
-import '../shared/app_drawer.dart'; // Import the AppDrawer
+import '../shared/app_drawer.dart';
 
 class ProductsScreen extends StatefulWidget {
   static const routeName = '/product_screen';
@@ -19,13 +19,21 @@ class _ProductScreenState extends State<ProductsScreen> {
   String? _selectedCategory;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = true;
-  final ScrollController _scrollController =
-      ScrollController(); // Add a scroll controller
+  final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchController =
+      TextEditingController(); 
+  String _searchQuery = ''; 
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    // Thêm listener cho search input
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
   }
 
   Future<void> _loadData() async {
@@ -44,8 +52,29 @@ class _ProductScreenState extends State<ProductsScreen> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose(); 
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final productsManager = Provider.of<ProductsManager>(context, listen: true);
+
+    // Lọc sản phẩm dựa trên category và search query
+    var filteredProducts = productsManager.items;
+    if (_selectedCategory != null) {
+      filteredProducts = filteredProducts
+          .where((product) => product.category == _selectedCategory)
+          .toList();
+    }
+    if (_searchQuery.isNotEmpty) {
+      filteredProducts = filteredProducts
+          .where((product) =>
+              product.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -57,7 +86,6 @@ class _ProductScreenState extends State<ProductsScreen> {
                 margin: EdgeInsets.only(left: 10, top: 10),
                 child: Column(
                   children: [
-                    // Add a menu icon to open the drawer
                     Row(
                       children: [
                         IconButton(
@@ -68,8 +96,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                         ),
                         SizedBox(width: 10),
                         Container(
-                          width:
-                              320, // Giới hạn chiều ngang của thanh search bar
+                          width: 290,
                           padding: EdgeInsets.only(left: 15.0, right: 10.0),
                           decoration: BoxDecoration(
                             color: color17,
@@ -79,11 +106,14 @@ class _ProductScreenState extends State<ProductsScreen> {
                             children: [
                               Expanded(
                                 child: TextField(
+                                  controller:
+                                      _searchController, 
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: "Search ...",
+                                    hintText: "Search by product name...",
                                     hintStyle: TextStyle(color: color4),
                                   ),
+                                  style: TextStyle(color: color4),
                                 ),
                               ),
                               Icon(Icons.search, color: color4, size: 30.0),
@@ -96,42 +126,32 @@ class _ProductScreenState extends State<ProductsScreen> {
                     Container(
                       height: 50,
                       width: 390,
-                      margin: EdgeInsets.only(left: 10, right:20),
+                      margin: EdgeInsets.only(left: 10, right: 20),
                       decoration: BoxDecoration(
-                        color: color13, // Colorize the bar
+                        color: color13,
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: RawScrollbar(
-                        controller:
-                            _scrollController, // Attach the scroll controller
-                        thumbVisibility: true, // Always show the scrollbar
-                        thumbColor: color4.withOpacity(0.5), // Scrollbar color
-                        radius: Radius.circular(
-                            10), // Rounded corners for the scrollbar
-                        thickness: 4, // Thin scrollbar
-                        minThumbLength:
-                            50, // Minimum length of the scrollbar thumb
-                        scrollbarOrientation: ScrollbarOrientation
-                            .bottom, // Place scrollbar at the bottom
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        thumbColor: color4.withOpacity(0.5),
+                        radius: Radius.circular(10),
+                        thickness: 4,
+                        minThumbLength: 50,
+                        scrollbarOrientation: ScrollbarOrientation.bottom,
                         child: ListView.builder(
-                          controller:
-                              _scrollController, // Attach the scroll controller
+                          controller: _scrollController,
                           scrollDirection: Axis.horizontal,
-                          itemCount: productsManager.categories.length +
-                              1, // +1 for "All"
+                          itemCount: productsManager.categories.length + 1,
                           itemBuilder: (context, index) {
                             if (index == 0) {
-                              // "All" button
                               return GestureDetector(
                                 onTap: () async {
                                   setState(() {
                                     _selectedCategory = null;
                                     _isLoading = true;
                                   });
-
-                                  await productsManager
-                                      .fetchProducts(); // Fetch all products
-
+                                  await productsManager.fetchProducts();
                                   setState(() {
                                     _isLoading = false;
                                   });
@@ -144,7 +164,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     color: _selectedCategory == null
                                         ? color17
                                         : color13,
-                                    borderRadius: BorderRadius.circular(5),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -161,7 +181,6 @@ class _ProductScreenState extends State<ProductsScreen> {
                                 ),
                               );
                             } else {
-                              // Category buttons
                               final category =
                                   productsManager.categories[index - 1];
                               return GestureDetector(
@@ -170,11 +189,8 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     _selectedCategory = category;
                                     _isLoading = true;
                                   });
-
                                   await productsManager.fetchProducts(
-                                      category:
-                                          category); // Fetch products by category
-
+                                      category: category);
                                   setState(() {
                                     _isLoading = false;
                                   });
@@ -187,7 +203,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     color: _selectedCategory == category
                                         ? color17
                                         : color13,
-                                    borderRadius: BorderRadius.circular(5),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Center(
                                     child: Text(
@@ -213,13 +229,15 @@ class _ProductScreenState extends State<ProductsScreen> {
                         ? Expanded(
                             child: Center(child: CircularProgressIndicator()),
                           )
-                        : productsManager.items.isEmpty
+                        : filteredProducts.isEmpty
                             ? Expanded(
                                 child: Center(
                                   child: Text(
-                                    _selectedCategory != null
-                                        ? "No products found in $_selectedCategory category"
-                                        : "No products found",
+                                    _searchQuery.isNotEmpty
+                                        ? "No products found matching '$_searchQuery'"
+                                        : _selectedCategory != null
+                                            ? "No products found in $_selectedCategory category"
+                                            : "No products found",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -235,12 +253,11 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    childAspectRatio: 0.65,
+                                    childAspectRatio: 0.597,
                                   ),
-                                  itemCount: productsManager.items.length,
+                                  itemCount: filteredProducts.length,
                                   itemBuilder: (context, index) {
-                                    final product =
-                                        productsManager.items[index];
+                                    final product = filteredProducts[index];
                                     return ProductItem(product: product);
                                   },
                                 ),
@@ -253,7 +270,7 @@ class _ProductScreenState extends State<ProductsScreen> {
         onPressed: () {
           Navigator.of(context).pushNamed(
             AddProductScreen.routeName,
-            arguments: null, // Pass null to indicate a new product
+            arguments: null,
           );
         },
         backgroundColor: color14,
@@ -273,116 +290,111 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      color: color2,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.all(8), // Add padding around the image
+    return SizedBox(
+      height: 300,
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        color: color2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.all(5),
               child: Center(
                 child: product.imageUrl.isNotEmpty
                     ? ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            10), // Border radius for the image
+                        borderRadius: BorderRadius.circular(10),
                         child: Image.network(
                           product.imageUrl,
-                          width: double.infinity, // Chiếm toàn bộ chiều rộng
-                          height: double.infinity, // Chiếm toàn bộ chiều cao
-                          fit: BoxFit.fill, // Adjust the image fit
+                          width: double.infinity,
+                          height: 150,
+                          fit: BoxFit.cover,
                         ),
                       )
-                    : Placeholder(), // Fallback for empty imageUrl
+                    : Placeholder(),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.title,
-                  style: TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold, color: color4),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Type: ${product.category}',
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500, color: color4),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Price: \$${product.price.toStringAsFixed(2)}',
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500, color: color4),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'In Stock: ${product.stockQuantity.toStringAsFixed(0)}',
-                  style: TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.w500, color: color4),
-                ),
-                SizedBox(height: 4),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Edit Button
-                    IconButton(
-                      icon: Icon(Icons.edit, color: color7),
-                      onPressed: () {
-                        Navigator.of(context).pushNamed(
-                          EditProductScreen.routeName,
-                          arguments: product
-                              .pid, // Pass ID instead of the whole product
-                        );
-                      },
+                    Text(
+                      product.title,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: color4),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    // Delete Button
-                    IconButton(
-                      icon: Icon(Icons.delete, color: color7),
-                      onPressed: () async {
-                        final confirm = await showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: Text("Confirm Delete"),
-                            content: Text(
-                                "Are you sure you want to delete this product?"),
-                            actions: [
-                              TextButton(
-                                child: Text("Cancel"),
-                                onPressed: () {
-                                  Navigator.of(ctx).pop(false);
-                                },
+                    SizedBox(height: 4),
+                    Text(
+                      'Price: \$${product.price.toStringAsFixed(2)}',
+                      style: TextStyle(fontSize: 12, color: color4),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'In Stock: ${product.stockQuantity.toStringAsFixed(0)}',
+                      style: TextStyle(fontSize: 12, color: color4),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: color7, size: 20),
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              EditProductScreen.routeName,
+                              arguments: product.pid,
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: color7, size: 20),
+                          onPressed: () async {
+                            final confirm = await showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: Text("Confirm Delete"),
+                                content: Text(
+                                    "Are you sure you want to delete this product?"),
+                                actions: [
+                                  TextButton(
+                                    child: Text("Cancel"),
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop(false);
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text("Delete"),
+                                    onPressed: () {
+                                      Navigator.of(ctx).pop(true);
+                                    },
+                                  ),
+                                ],
                               ),
-                              TextButton(
-                                child: Text("Delete"),
-                                onPressed: () {
-                                  Navigator.of(ctx).pop(true);
-                                },
-                              ),
-                            ],
-                          ),
-                        );
+                            );
 
-                        if (confirm == true) {
-                          Provider.of<ProductsManager>(context, listen: false)
-                              .deleteProduct(product.pid!);
-                        }
-                      },
+                            if (confirm == true) {
+                              Provider.of<ProductsManager>(context,
+                                      listen: false)
+                                  .deleteProduct(product.pid!);
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ],
-                )
-              ],
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

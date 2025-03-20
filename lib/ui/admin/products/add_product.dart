@@ -85,9 +85,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
       final productsManager = context.read<ProductsManager>();
 
       // Log what we're saving to help with debugging
-      print('‼️ Saving product with category: ${_editedProduct.category}');
+      print('✅ Saving product with category: ${_editedProduct.category}');
       print(
-          '‼️ Saving product with stock quantity: ${_editedProduct.stockQuantity}');
+          '✅ Saving product with stock quantity: ${_editedProduct.stockQuantity}');
 
       if (_editedProduct.pid != null) {
         await productsManager.updateProduct(_editedProduct);
@@ -101,7 +101,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         );
       }
     } catch (error) {
-      print('Error during save: $error');
+      print('❌ Error during save: $error');
       if (mounted) {
         await showErrorDialog(
           context,
