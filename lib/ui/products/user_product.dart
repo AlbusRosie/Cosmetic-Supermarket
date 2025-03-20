@@ -22,7 +22,7 @@ class _UserProduct extends State<UserProduct>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
-  bool _isAddingToCart = false; // Track loading state
+  bool _isAddingToCart = false;
 
   @override
   void initState() {
@@ -69,7 +69,6 @@ class _UserProduct extends State<UserProduct>
     _animateAddToCart();
     final cart = context.read<CartManager>();
 
-    // Step 1: Check if stockQuantity is 0
     if (widget.product.stockQuantity <= 0) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -83,10 +82,8 @@ class _UserProduct extends State<UserProduct>
         );
       return;
     }
-
-    // Step 2: Add item to cart and handle potential errors
     setState(() {
-      _isAddingToCart = true; // Show loading indicator
+      _isAddingToCart = true;
     });
 
     try {
@@ -108,10 +105,8 @@ class _UserProduct extends State<UserProduct>
           ),
         );
     } catch (error) {
-      // Standardize the error message
       String errorMessage = error.toString();
       if (errorMessage.contains('Product is out of stock')) {
-        // Already in the correct format
       } else if (errorMessage.contains('Failed to add product to cart')) {
         errorMessage = 'Unable to add item to cart. Please try again.';
       } else {
@@ -129,7 +124,7 @@ class _UserProduct extends State<UserProduct>
         );
     } finally {
       setState(() {
-        _isAddingToCart = false; // Hide loading indicator
+        _isAddingToCart = false;
       });
     }
   }
@@ -282,7 +277,7 @@ class _UserProduct extends State<UserProduct>
                                     child: IconButton(
                                       onPressed: _isAddingToCart
                                           ? null
-                                          : _handleAddToCart, // Disable button while loading
+                                          : _handleAddToCart,
                                       icon: _isAddingToCart
                                           ? SizedBox(
                                               width: 24,

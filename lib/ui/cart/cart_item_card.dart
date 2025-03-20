@@ -29,25 +29,22 @@ class _CartItemCardState extends State<CartItemCard> {
   }
 
   Future<void> _incrementQuantity() async {
-    if (_isUpdatingQuantity) return; // Prevent multiple clicks
+    if (_isUpdatingQuantity) return;
 
     setState(() {
-      _isUpdatingQuantity = true; // Show loading state
+      _isUpdatingQuantity = true;
       _quantity++;
     });
 
     try {
       await context.read<CartManager>().updateItemQuantity(
-            widget.cartItem.productId, // Use productId, not id
+            widget.cartItem.productId,
             _quantity,
           );
-      // Success: Quantity updated
     } catch (error) {
-      // Revert quantity on error
       setState(() {
         _quantity--;
       });
-      // Show error message
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -59,7 +56,7 @@ class _CartItemCardState extends State<CartItemCard> {
         );
     } finally {
       setState(() {
-        _isUpdatingQuantity = false; // Hide loading state
+        _isUpdatingQuantity = false;
       });
     }
   }
@@ -68,22 +65,19 @@ class _CartItemCardState extends State<CartItemCard> {
     if (_quantity <= 1 || _isUpdatingQuantity) return;
 
     setState(() {
-      _isUpdatingQuantity = true; // Show loading state
+      _isUpdatingQuantity = true;
       _quantity--;
     });
 
     try {
       await context.read<CartManager>().updateItemQuantity(
-            widget.cartItem.productId, // Use productId, not id
+            widget.cartItem.productId,
             _quantity,
           );
-      // Success: Quantity updated
     } catch (error) {
-      // Revert quantity on error
       setState(() {
         _quantity++;
       });
-      // Show error message
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -95,7 +89,7 @@ class _CartItemCardState extends State<CartItemCard> {
         );
     } finally {
       setState(() {
-        _isUpdatingQuantity = false; // Hide loading state
+        _isUpdatingQuantity = false;
       });
     }
   }

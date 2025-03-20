@@ -38,12 +38,9 @@ class CartManager with ChangeNotifier {
 
   Future<void> addItem(Product product, {int quantity = 1}) async {
     try {
-      // Step 1: Check the product's stockQuantity
       if (product.stockQuantity <= 0) {
         throw Exception('Product is out of stock.');
       }
-
-      // Step 2: Calculate the total quantity after adding
       int currentQuantity =
           _items.containsKey(product.pid!) ? _items[product.pid!]!.quantity : 0;
       final totalQuantity = currentQuantity + quantity;
@@ -52,8 +49,6 @@ class CartManager with ChangeNotifier {
         throw Exception(
             'Product is out of stock. Current stock quantity: ${product.stockQuantity}');
       }
-
-      // Step 3: Add or update the cart item
       if (_items.containsKey(product.pid!)) {
         final updatedQuantity = _items[product.pid!]!.quantity + quantity;
         final updatedItem =
@@ -77,28 +72,25 @@ class CartManager with ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      throw error; // Throw the error for the UI to handle
+      throw error;
     }
   }
 
   Future<void> updateItem(CartItem item) async {
     try {
-      // Step 1: Check if the item exists in the cart
       if (!_items.containsKey(item.productId)) {
         throw Exception(
             'Cart item with product ID ${item.productId} not found.');
       }
-
-      // Step 2: Update the cart item via the service
       final updatedItem = await _cartsService.updateCartItem(item);
       if (updatedItem != null) {
-        _items[item.productId] = updatedItem; // Use productId as the key
+        _items[item.productId] = updatedItem;
         notifyListeners();
       } else {
         throw Exception('Failed to update cart item.');
       }
     } catch (error) {
-      throw error; // Throw the error for the UI to handle
+      throw error;
     }
   }
 
@@ -166,7 +158,7 @@ class CartManager with ChangeNotifier {
       _items[productId] = updatedItem;
       notifyListeners();
     } catch (error) {
-      throw error; // Throw the error for the UI to handle
+      throw error;
     }
   }
 }
