@@ -148,7 +148,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                 onTap: () async {
                                   setState(() {
                                     _selectedCategory = null;
-                                    _isLoading = true;
+                                    _isLoading = false;
                                   });
                                   await productsManager.fetchProducts();
                                   setState(() {
@@ -186,7 +186,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                 onTap: () async {
                                   setState(() {
                                     _selectedCategory = category;
-                                    _isLoading = true;
+                                    _isLoading = false;
                                   });
                                   await productsManager.fetchProducts(
                                       category: category);

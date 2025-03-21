@@ -241,6 +241,14 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final totalQuantity =
         order.products.fold<int>(0, (sum, product) => sum + (product.quantity));
 
+    // Function to truncate product title if it's too long
+    String truncateProductTitle(String title, {int maxLength = 20}) {
+      if (title.length <= maxLength) {
+        return title;
+      }
+      return '${title.substring(0, maxLength)}...';
+    }
+
     showDialog(
       context: context,
       builder: (ctx) => Dialog(
@@ -248,146 +256,111 @@ class _OrdersScreenState extends State<OrdersScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    "Order ID: ${order.id}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: color4,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Name: ${order.user?.username}",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: color4,
-                    ),
-                  ),
-                  Text(
-                    "Phone: ${order.user?.phone}",
-                    style: TextStyle(color: color4),
-                  ),
-                  const Divider(),
-                  Text(
-                    "Items:",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: color4,
-                    ),
-                  ),
-                  ...order.products.map((prod) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "${prod.quantity}x ${prod.title}",
-                              style: TextStyle(color: color4),
-                            ),
-                            Text(
-                              "\$${prod.price.toStringAsFixed(2)}",
-                              style: TextStyle(color: color4),
-                            ),
-                          ],
-                        ),
-                      )),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Total Quantity:",
-                        style: TextStyle(color: color4),
-                      ),
-                      Text(
-                        "$totalQuantity",
-                        style: TextStyle(color: color4),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Total Amount:",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: color4,
-                        ),
-                      ),
-                      Text(
-                        "\$${order.amount.toStringAsFixed(2)}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: color4,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  if (order.status == 'Confirmed') ...[
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: 10),
+                    Text(
+                      "Order ID: ${order.id}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: color4,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Name: ${order.user?.username}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: color4,
+                      ),
+                    ),
+                    Text(
+                      "Phone: ${order.user?.phone}",
+                      style: TextStyle(color: color4),
+                    ),
+                    const Divider(),
+                    Text(
+                      "Items:",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: color4,
+                      ),
+                    ),
+                    // Add a constrained height and scrollbar for the product list
+                    Container(
+                      constraints: BoxConstraints(
+                        maxHeight: order.products.length > 3
+                            ? 120 // Set a max height for more than 3 products
+                            : double
+                                .infinity, // No height constraint if 3 or fewer products
+                      ),
+                      child: Scrollbar(
+                        thumbVisibility: order.products.length >
+                            3, // Show scrollbar only if more than 3 products
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: order.products.map((prod) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Truncate the product title if it's too long
+                                    SizedBox(
+                                      width:
+                                          200, // Constrain the width to ensure truncation works
+                                      child: Text(
+                                        "${prod.quantity}x ${truncateProductTitle(prod.title)}",
+                                        style: TextStyle(color: color4),
+                                        overflow: TextOverflow
+                                            .ellipsis, // Fallback in case of overflow
+                                      ),
+                                    ),
+                                    Text(
+                                      "\$${prod.price.toStringAsFixed(2)}",
+                                      style: TextStyle(color: color4),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Update Status:",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: color4,
-                          ),
-                        ),
-                        DropdownButton<String>(
-                          value: newStatus,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'Confirmed',
-                              child: Text('Confirmed'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Completed',
-                              child: Text('Completed'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Canceled',
-                              child: Text('Canceled'),
-                            ),
-                          ],
-                          onChanged: (String? value) async {
-                            if (value != null && value != order.status) {
-                              setState(() => _isLoading = true);
-                              await ordersManager.updateOrderStatus(
-                                  order.id!, value);
-                              setState(() => _isLoading = false);
-                              Navigator.of(ctx).pop();
-                              setState(() {
-                                _fetchOrders = Provider.of<OrdersManager>(
-                                        context,
-                                        listen: false)
-                                    .fetchAllOrders();
-                              });
-                            }
-                          },
+                          "Total Quantity:",
                           style: TextStyle(color: color4),
-                          dropdownColor: color13,
-                          underline: Container(),
+                        ),
+                        Text(
+                          "$totalQuantity",
+                          style: TextStyle(color: color4),
                         ),
                       ],
                     ),
-                  ] else ...[
-                    const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Status: ${order.status}",
+                          "Total Amount:",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: color4,
+                          ),
+                        ),
+                        Text(
+                          "\$${order.amount.toStringAsFixed(2)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: color4,
@@ -395,8 +368,74 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         ),
                       ],
                     ),
+                    const Divider(),
+                    if (order.status == 'Confirmed') ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Update Status:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: color4,
+                            ),
+                          ),
+                          DropdownButton<String>(
+                            value: newStatus,
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Confirmed',
+                                child: Text('Confirmed'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Completed',
+                                child: Text('Completed'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Canceled',
+                                child: Text('Canceled'),
+                              ),
+                            ],
+                            onChanged: (String? value) async {
+                              if (value != null && value != order.status) {
+                                setState(() => _isLoading = true);
+                                await ordersManager.updateOrderStatus(
+                                    order.id!, value);
+                                setState(() => _isLoading = false);
+                                Navigator.of(ctx).pop();
+                                setState(() {
+                                  _fetchOrders = Provider.of<OrdersManager>(
+                                          context,
+                                          listen: false)
+                                      .fetchAllOrders();
+                                });
+                              }
+                            },
+                            style: TextStyle(color: color4),
+                            dropdownColor: color13,
+                            underline: Container(),
+                          ),
+                        ],
+                      ),
+                    ] else ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Status: ${order.status}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: color4,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 10),
                   ],
-                ],
+                ),
               ),
             ),
             Positioned(

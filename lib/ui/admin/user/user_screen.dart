@@ -217,68 +217,70 @@ class _UsersScreenState extends State<UsersScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Text(
-                    "Customer Details",
-                    style: TextStyle(
-                      color: color4,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      "Customer Details",
+                      style: TextStyle(
+                        color: color4,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: color4.withOpacity(0.2),
-                        backgroundImage:
-                            user.avatar != null && user.avatar!.isNotEmpty
-                                ? NetworkImage(user.avatar!)
-                                : null,
-                        child: user.avatar == null || user.avatar!.isEmpty
-                            ? Text(
-                                user.username.isNotEmpty
-                                    ? user.username[0].toUpperCase()
-                                    : 'U',
-                                style: TextStyle(color: color4, fontSize: 24),
-                              )
-                            : null,
-                      ),
-                      const SizedBox(width: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user.username,
-                            style: TextStyle(
-                              color: color4,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: color4.withOpacity(0.2),
+                          backgroundImage:
+                              user.avatar != null && user.avatar!.isNotEmpty
+                                  ? NetworkImage(user.avatar!)
+                                  : null,
+                          child: user.avatar == null || user.avatar!.isEmpty
+                              ? Text(
+                                  user.username.isNotEmpty
+                                      ? user.username[0].toUpperCase()
+                                      : 'U',
+                                  style: TextStyle(color: color4, fontSize: 24),
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              user.username,
+                              style: TextStyle(
+                                color: color4,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
                             ),
-                          ),
-                          Text(
-                            user.email,
-                            style: TextStyle(color: color4),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 15),
-                  const Divider(color: Colors.grey),
-                  const SizedBox(height: 15),
-                  _buildDetailRow('Phone', user.phone),
-                  _buildDetailRow('Address', user.address ?? 'Not provided'),
-                  _buildDetailRow('Role', user.urole ?? 'customer'),
-                  const SizedBox(height: 20),
-                ],
+                            Text(
+                              user.email,
+                              style: TextStyle(color: color4),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 15),
+                    const Divider(color: Colors.grey),
+                    const SizedBox(height: 15),
+                    _buildDetailRow('Phone', user.phone),
+                    _buildDetailRow('Address', user.address ?? 'Not provided'),
+                    _buildDetailRow('Role', user.urole ?? 'customer'),
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
             Positioned(
@@ -300,18 +302,19 @@ class _UsersScreenState extends State<UsersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start, 
         children: [
           Text(
             '$label:',
             style: TextStyle(color: color4, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
-            width: 200,
+          const SizedBox(width: 10), 
+          Expanded(
             child: Text(
               value,
               style: TextStyle(color: color4),
               textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
+              softWrap: true, 
             ),
           ),
         ],
