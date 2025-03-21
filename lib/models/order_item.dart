@@ -1,5 +1,5 @@
 import 'cart_item.dart';
-import 'user.dart'; // Import User model
+import 'user.dart';
 
 class OrderItem {
   final String? id;
@@ -7,20 +7,17 @@ class OrderItem {
   final List<CartItem> products;
   final DateTime dateTime;
   final String status;
-  final String? userId;
-  final User? user; // Thêm user object
+  int get productCount {
+    return products.length;
+  }
 
-  int get productCount => products.length;
-
-  OrderItem({
-    this.id,
-    required this.amount,
-    required this.products,
-    DateTime? dateTime,
-    this.status = 'confirmed',
-    this.userId,
-    this.user, // Khởi tạo user
-  }) : dateTime = dateTime ?? DateTime.now();
+  OrderItem(
+      {this.id,
+      required this.amount,
+      required this.products,
+      DateTime? dateTime,
+      this.status = 'confirmed'})
+      : dateTime = dateTime ?? DateTime.now();
 
   OrderItem copyWith({
     String? id,
@@ -28,8 +25,6 @@ class OrderItem {
     List<CartItem>? products,
     DateTime? dateTime,
     String? status,
-    String? userId,
-    User? user, // Thêm user trong copyWith
   }) {
     return OrderItem(
       id: id ?? this.id,
@@ -37,8 +32,6 @@ class OrderItem {
       products: products ?? this.products,
       dateTime: dateTime ?? this.dateTime,
       status: status ?? this.status,
-      userId: userId ?? this.userId,
-      user: user ?? this.user,
     );
   }
 
@@ -48,25 +41,19 @@ class OrderItem {
       'amount': amount,
       'dateTime': dateTime.toIso8601String(),
       'products': products.map((p) => p.toJson()).toList(),
-      'status': status,
-      'userId': userId,
-      'user': user?.toJson(), // Serialize User object
+      'status': status
     };
   }
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
       id: json['id'],
-      amount: json['amount'].toDouble(),
+      amount: json['amount'],
       dateTime: DateTime.parse(json['dateTime']),
       products: (json['products'] as List<dynamic>)
-          .map((p) => CartItem.fromJson(p))
+          .map((p) => CartItem.fromJson(p as Map<String, dynamic>))
           .toList(),
       status: json['status'] ?? 'confirmed',
-      userId: json['userId'],
-      user: json['user'] != null
-          ? User.fromJson(json['user'])
-          : null, // Deserialize User
     );
   }
 }

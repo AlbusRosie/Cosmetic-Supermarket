@@ -1,4 +1,5 @@
 {
+  "java.configuration.updateBuildConfiguration": "interactive",
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#f9fcff",
     "activityBar.background": "#f9fcff",
@@ -18,10 +19,10 @@
     "titleBar.inactiveBackground": "#c6e7ff99",
     "titleBar.inactiveForeground": "#15202b99"
   },
-"peacock.color": "#C6E7FF",
-"cSpell.words": [
-  "AUTOINCREMENT",
-  "confirmpassword",
-  "Larana"
-]
+  "peacock.color": "#C6E7FF",
+  "cSpell.words": [
+    "AUTOINCREMENT",
+    "confirmpassword",
+    "Larana"
+  ]
 }

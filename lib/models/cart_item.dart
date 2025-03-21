@@ -7,14 +7,14 @@ class CartItem {
   final String imageUrl;
   final String status;
 
-  CartItem(
-      {this.id,
-      required this.productId,
-      required this.title,
-      required this.price,
-      required this.quantity,
-      this.imageUrl = '',
-      this.status = 'pending'});
+  CartItem({
+    this.id,
+    required this.productId,
+    required this.title,
+    required this.price,
+    required this.quantity,
+    this.imageUrl = '',
+    this.status = 'pending'});
 
   CartItem copyWith({
     String? id,

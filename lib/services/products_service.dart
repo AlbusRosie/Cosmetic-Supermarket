@@ -9,6 +9,14 @@ class ProductsService {
     final featuredImageName = productModel.getStringValue('featuredImage');
     return pb.files.getUrl(productModel, featuredImageName).toString();
   }
+  Future<List<Product>> fetchProducts({bool filteredByUser = false}) async {
+    final List<Product> products = [];
+    try {
+      final pb = await getPocketbaseInstance();
+      final userId = pb.authStore.record!.id;
+      final productModels = await pb
+          .collection('products')
+          .getFullList(filter: filteredByUser ? "userId='$userId'" : null);
 
   Future<Product?> addProduct(Product product) async {
     try {
@@ -56,7 +64,6 @@ class ProductsService {
 
       final productModels = await pb.collection('products').getFullList(
           filter: combinedFilter.isNotEmpty ? combinedFilter : null);
-
       for (final productModel in productModels) {
         products.add(
           Product.fromJson(
@@ -67,29 +74,29 @@ class ProductsService {
       }
       return products;
     } catch (error) {
-      print('❌ Error fetching products: $error');
+      print('Error fetching products: $error');
       return products;
     }
   }
-
-  Future<List<String>> fetchCategories() async {
+Future<Product?> updateProduct(Product product) async {
     try {
       final pb = await getPocketbaseInstance();
-      final productModels = await pb!.collection('products').getFullList();
-      final categories = productModels
-          .map((model) => model.getStringValue('category'))
-          .where(
-              (category) => category.isNotEmpty) // Filter out empty categories
-          .toSet() // Ensure unique categories
-          .toList();
-      return categories;
+
+      final productModel = await pb.collection('products').update(
+            product.pid!,
+            body: product.toJson(),
+          );
+
+      return product.copyWith(
+        imageUrl: product.featuredImage != null
+            ? _getFeaturedImageUrl(pb, productModel)
+            : product.imageUrl,
+      );
     } catch (error) {
-      print('❌ Error fetching categories: $error');
-      return [];
+      return null;
     }
   }
-
-  Future<Product?> updateProduct(Product product) async {
+  Future<Product?> updateProduct_master(Product product) async {
     try {
       final pb = await getPocketbaseInstance();
       final productModel = await pb!.collection('products').update(
@@ -108,6 +115,7 @@ class ProductsService {
                   ]
                 : [],
           );
+
       return product.copyWith(
         imageUrl: product.featuredImage != null
             ? _getFeaturedImageUrl(pb, productModel)
@@ -116,6 +124,21 @@ class ProductsService {
     } catch (error) {
       print('❌ Error updating product: $error');
       return null;
+    }
+  }
+  Future<List<String>> fetchCategories() async {
+    try {
+      final pb = await getPocketbaseInstance();
+      final productModels = await pb!.collection('products').getFullList();
+      final categories = productModels
+          .map((model) => model.getStringValue('category'))
+          .where((category) => category.isNotEmpty)
+          .toSet()
+          .toList();
+      return categories;
+    } catch (error) {
+      print('❌ Error fetching categories: $error');
+      return [];
     }
   }
 

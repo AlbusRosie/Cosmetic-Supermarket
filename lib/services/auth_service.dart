@@ -87,7 +87,6 @@ class AuthService {
     if (pb == null) {
       throw Exception("PocketBase not initialized. Please restart the app.");
     }
-
     try {
       final authRecord =
           await pb.collection('users').authWithPassword(email, password);

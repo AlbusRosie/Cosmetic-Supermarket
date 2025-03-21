@@ -10,6 +10,7 @@ class Product {
   final bool isFavorite;
   final int stockQuantity;
   final String category;
+  final bool locked;
 
   Product({
     this.pid,
@@ -21,10 +22,12 @@ class Product {
     this.isFavorite = false,
     required this.stockQuantity,
     required this.category,
+    this.locked = false,
   });
 
   Product copyWith({
     String? pid,
+    String? pname,
     String? title,
     String? description,
     double? price,
@@ -33,10 +36,11 @@ class Product {
     bool? isFavorite,
     int? stockQuantity,
     String? category,
+    bool? locked,
   }) {
     return Product(
       pid: pid ?? this.pid,
-      title: title ?? this.title,
+      title: pname ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
       featuredImage: featuredImage ?? this.featuredImage,
@@ -44,6 +48,7 @@ class Product {
       isFavorite: isFavorite ?? this.isFavorite,
       stockQuantity: stockQuantity ?? this.stockQuantity,
       category: category ?? this.category,
+      locked: locked ?? this.locked,
     );
   }
 
@@ -57,23 +62,23 @@ class Product {
       'description': description,
       'price': price,
       'isFavorite': isFavorite,
-      'stockQuantity': stockQuantity,
+      'stockQuantity':stockQuantity,
       'category': category,
+      'locked': locked,
     };
   }
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      pid: json['id'],
+      pid: json['id'] ,
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      price: (json['price'] is int)
-          ? (json['price'] as int).toDouble()
-          : (json['price'] ?? 0.0),
+      price: json['price'] ?? 0.0,
       isFavorite: json['isFavorite'] ?? false,
       imageUrl: json['imageUrl'] ?? '',
       stockQuantity: json['stockQuantity'] ?? 0,
       category: json['category'] ?? '',
+      locked: json['locked'] ?? false,
     );
   }
 }
