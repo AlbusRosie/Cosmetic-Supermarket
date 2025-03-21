@@ -36,24 +36,23 @@ class AuthService {
     }
 
     try {
-      // Check if the phone number already exists
-      final existingPhoneUsers = await pb.collection('users').getList(
-            filter: 'phone = "$phone"',
-          );
-      if (existingPhoneUsers.items.isNotEmpty) {
-        throw Exception(
-            "This phone number is already in use. Please use a different one.");
-      }
-
       // Check if the email already exists
       final existingEmailUsers = await pb.collection('users').getList(
             filter: 'email = "$email"',
           );
       if (existingEmailUsers.items.isNotEmpty) {
-        throw Exception(
+        throw (
             "This email is already registered. Please use a different one.");
       }
 
+      // Check if the phone number already exists
+      final existingPhoneUsers = await pb.collection('users').getList(
+            filter: 'phone = "$phone"',
+          );
+      if (existingPhoneUsers.items.isNotEmpty) {
+        throw (
+            "This phone number is already in use. Please use a different one.");
+      }
       print('Creating user: $email');
 
       final record = await pb.collection('users').create(body: {

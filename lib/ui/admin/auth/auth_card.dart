@@ -25,6 +25,7 @@ class _AuthCardState extends State<AuthCard> {
   };
   final _isSubmitting = ValueNotifier<bool>(false);
   final _passwordController = TextEditingController();
+  bool _obscurePassword = true; 
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
@@ -75,7 +76,7 @@ class _AuthCardState extends State<AuthCard> {
           padding: const EdgeInsets.only(top: 0.0),
           child: Container(
             width: double.infinity,
-            height: size.height * 0.75,
+            height: size.height * 0.9,
             decoration: const BoxDecoration(
               color: color17,
               borderRadius: BorderRadius.only(
@@ -147,7 +148,7 @@ class _AuthCardState extends State<AuthCard> {
         }
         return null;
       },
-      onSaved: (value) => _authData['username'] = value!, 
+      onSaved: (value) => _authData['username'] = value!,
     );
   }
 
@@ -183,7 +184,7 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Password",
       icon: Icons.lock,
-      obscureText: true,
+      obscureText: _obscurePassword, 
       controller: _passwordController,
       validator: (value) {
         if (value == null || value.length < 5) {
@@ -192,6 +193,17 @@ class _AuthCardState extends State<AuthCard> {
         return null;
       },
       onSaved: (value) => _authData['password'] = value!,
+      suffixIcon: IconButton(
+        icon: Icon(
+          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+          color: color1,
+        ),
+        onPressed: () {
+          setState(() {
+            _obscurePassword = !_obscurePassword; 
+          });
+        },
+      ),
     );
   }
 
@@ -199,13 +211,24 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Confirm Password",
       icon: Icons.lock_reset,
-      obscureText: true,
+      obscureText: _obscurePassword, 
       validator: (value) {
         if (value != _passwordController.text) {
           return 'Passwords do not match!';
         }
         return null;
       },
+      suffixIcon: IconButton(
+        icon: Icon(
+          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+          color: color1,
+        ),
+        onPressed: () {
+          setState(() {
+            _obscurePassword = !_obscurePassword; 
+          });
+        },
+      ),
     );
   }
 
@@ -265,6 +288,7 @@ class _AuthCardState extends State<AuthCard> {
     TextEditingController? controller,
     String? Function(String?)? validator,
     void Function(String?)? onSaved,
+    Widget? suffixIcon, // Added to support the eye icon
   }) {
     return TextFieldContainer(
       child: TextFormField(
@@ -282,6 +306,7 @@ class _AuthCardState extends State<AuthCard> {
           hintStyle: const TextStyle(color: color1),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 20),
+          suffixIcon: suffixIcon, // Add the eye icon here
         ),
         validator: validator,
         onSaved: onSaved,
@@ -309,7 +334,7 @@ class TextFieldContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         border: Border.all(color: color4, width: 1.5),
       ),
-      child: child
+      child: child,
     );
   }
 }
