@@ -1,4 +1,5 @@
 import 'dart:io';
+
 class Product {
   final String? pid;
   final String title;
@@ -27,6 +28,7 @@ class Product {
   Product copyWith({
     String? pid,
     String? pname,
+    String? title,
     String? description,
     double? price,
     File? featuredImage,

@@ -1,4 +1,5 @@
 import 'cart_item.dart';
+import 'user.dart';
 
 class OrderItem {
   final String? id;
@@ -6,7 +7,6 @@ class OrderItem {
   final List<CartItem> products;
   final DateTime dateTime;
   final String status;
-
   int get productCount {
     return products.length;
   }
