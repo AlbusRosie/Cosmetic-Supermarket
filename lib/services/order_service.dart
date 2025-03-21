@@ -14,10 +14,50 @@ class OrderService {
         final orderJson = orderModel.toJson();
         final List<CartItem> products = [];
 
+        // Ensure products field exists and is a list
+        if (orderJson['products'] == null || orderJson['products'] is! List) {
+          print(
+              '⚠️ Order ${orderJson['id']} has no products or invalid products field');
+          continue; // Skip this order if products field is invalid
+        }
+
         for (final cartId in orderJson['products']) {
           try {
+            // Validate cartId
+            if (cartId == null || cartId.isEmpty) {
+              print('⚠️ Invalid cartId in order ${orderJson['id']}: $cartId');
+              products.add(CartItem(
+                id: '',
+                productId: '',
+                title: 'Unknown Product (Invalid Cart ID)',
+                price: 0.0,
+                quantity: 0,
+                status: 'error',
+              ));
+              continue;
+            }
+
+            // Fetch cart item
             final cartModel = await pb.collection('carts').getOne(cartId);
             final cartJson = cartModel.toJson();
+
+            // Validate productId in cart
+            if (cartJson['productId'] == null ||
+                cartJson['productId'].isEmpty) {
+              print(
+                  '⚠️ Cart $cartId in order ${orderJson['id']} has no productId');
+              products.add(CartItem(
+                id: cartJson['id'] ?? '',
+                productId: '',
+                title: 'Unknown Product (Missing Product ID)',
+                price: 0.0,
+                quantity: cartJson['quantity'] ?? 0,
+                status: cartJson['status'] ?? 'pending',
+              ));
+              continue;
+            }
+
+            // Fetch product
             final productModel =
                 await pb.collection('products').getOne(cartJson['productId']);
             final productJson = productModel.toJson();
@@ -26,12 +66,21 @@ class OrderService {
               id: cartJson['id'] ?? '',
               productId: cartJson['productId'] ?? '',
               title: productJson['title'] ?? 'Unknown Product',
-              price: productJson['price'] ?? 0.0,
+              price: productJson['price']?.toDouble() ?? 0.0,
               quantity: cartJson['quantity'] ?? 0,
               status: cartJson['status'] ?? 'pending',
             ));
           } catch (error) {
-            print('❌ Error fetching cart or product: $error');
+            print(
+                '❌ Error fetching cart or product for cartId $cartId in order ${orderJson['id']}: $error');
+            products.add(CartItem(
+              id: cartId.toString(),
+              productId: '',
+              title: 'Error: Product Not Found',
+              price: 0.0,
+              quantity: 0,
+              status: 'error',
+            ));
           }
         }
 
@@ -43,7 +92,7 @@ class OrderService {
             user = User.fromJson(userModel.toJson());
           }
         } catch (error) {
-          print('❌ Error fetching user: $error');
+          print('❌ Error fetching user for order ${orderJson['id']}: $error');
           user = null;
         }
 
