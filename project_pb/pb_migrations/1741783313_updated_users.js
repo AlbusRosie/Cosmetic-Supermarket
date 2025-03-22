@@ -1,0 +1,42 @@
+/// <reference path="../pb_data/types.d.ts" />
+migrate((app) => {
+  const collection = app.findCollectionByNameOrId("_pb_users_auth_")
+
+  // update field
+  collection.fields.addAt(8, new Field({
+    "autogeneratePattern": "[a-z0-9]{30}",
+    "hidden": false,
+    "id": "text1146066909",
+    "max": 0,
+    "min": 0,
+    "name": "phone",
+    "pattern": "^[a-z0-9]+$",
+    "presentable": false,
+    "primaryKey": false,
+    "required": false,
+    "system": false,
+    "type": "text"
+  }))
+
+  return app.save(collection)
+}, (app) => {
+  const collection = app.findCollectionByNameOrId("_pb_users_auth_")
+
+  // update field
+  collection.fields.addAt(8, new Field({
+    "autogeneratePattern": "",
+    "hidden": false,
+    "id": "text1146066909",
+    "max": 0,
+    "min": 0,
+    "name": "phone",
+    "pattern": "",
+    "presentable": false,
+    "primaryKey": false,
+    "required": false,
+    "system": false,
+    "type": "text"
+  }))
+
+  return app.save(collection)
+})
