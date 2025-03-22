@@ -41,6 +41,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
             email: '',
             avatar: '',
             phone: '',
+            address: '',
           )
         : widget.user!;
     _loadUserData();
@@ -110,9 +111,8 @@ class _EditUserScreenState extends State<EditUserScreen> {
       await Provider.of<AuthManager>(context, listen: false).logout();
       if (mounted) {
         print('Closing all screens and navigating to /auth...');
-        Navigator.of(context).popUntil((route) => route.isFirst); // Đóng tất cả
-        Navigator.of(context).pushReplacementNamed(
-            AuthScreen.routeName); // Dùng routeName trực tiếp
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
       } else {
         print('Widget not mounted, skipping navigation.');
       }
@@ -158,6 +158,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
                       _buildUsernameField(),
                       const SizedBox(height: 20),
                       _buildEmailField(),
+                      const SizedBox(height: 20),
+                      _buildPhoneField(),
+                      const SizedBox(height: 20),
+                      _buildAddressField(),
                       const SizedBox(height: 30),
                       _buildActionButtons(),
                     ],
@@ -175,7 +179,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
     return Center(
       child: Stack(
-        clipBehavior: Clip.none, // Cho phép widget con tràn ra ngoài nếu cần
+        clipBehavior: Clip.none,
         alignment: Alignment.bottomRight,
         children: [
           Container(
@@ -198,7 +202,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   ? const Center(
                       child: Icon(Icons.person, size: 60, color: laranaPink))
                   : FittedBox(
-                      fit: BoxFit.cover, // Đảm bảo ảnh lấp đầy container
+                      fit: BoxFit.cover,
                       child: _selectedAvatar == null
                           ? Image.network(
                               _editedUser.avatar!,
@@ -216,10 +220,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
             ),
           ),
           Positioned(
-            right: 5, // Tăng khoảng cách để tránh tràn ra ngoài
+            right: 5,
             bottom: 0,
             child: Container(
-              margin: const EdgeInsets.all(4), // Thêm margin để cách biên
+              margin: const EdgeInsets.all(4),
               child: CircleAvatar(
                 backgroundColor: laranaPink,
                 radius: 20,
@@ -255,7 +259,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
       ),
     );
   }
-
 
   Widget _buildUsernameField() {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
@@ -310,6 +313,75 @@ class _EditUserScreenState extends State<EditUserScreen> {
       ),
       enabled: false,
       style: const TextStyle(fontSize: 16, color: Colors.black87),
+    );
+  }
+
+  // Updated Phone Field
+  Widget _buildPhoneField() {
+    const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
+    return TextFormField(
+      initialValue: _editedUser.phone,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.phone, color: laranaPink),
+        hintText: 'Phone (e.g., 0123456789)',
+        hintStyle: const TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: const Color.fromARGB(255, 255, 240, 240),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+      ),
+      textInputAction: TextInputAction.next,
+      keyboardType: TextInputType.phone,
+      style: const TextStyle(fontSize: 16, color: Colors.black87),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please provide a phone number.';
+        }
+        // Kiểm tra số điện thoại bắt đầu bằng 0 và có đúng 10 chữ số
+        if (!RegExp(r'^0\d{9}$').hasMatch(value)) {
+          return 'Please enter a valid Vietnamese phone number (e.g., 0123456789).';
+        }
+        return null;
+      },
+      onSaved: (value) {
+        _editedUser = _editedUser.copyWith(phone: value);
+      },
+    );
+  }
+
+  // Address Field
+  Widget _buildAddressField() {
+    const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
+    return TextFormField(
+      initialValue: _editedUser.address,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.location_on, color: laranaPink),
+        hintText: 'Address',
+        hintStyle: const TextStyle(color: Colors.grey),
+        filled: true,
+        fillColor: const Color.fromARGB(255, 255, 240, 240),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+      ),
+      textInputAction: TextInputAction.next,
+      style: const TextStyle(fontSize: 16, color: Colors.black87),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please provide an address.';
+        }
+        return null;
+      },
+      onSaved: (value) {
+        _editedUser = _editedUser.copyWith(address: value);
+      },
     );
   }
 
