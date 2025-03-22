@@ -8,7 +8,7 @@ import '../../../components/colors.dart';
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
-  static const routeName = '/orders';
+  static const routeName = '/admin_orders';
 
   @override
   State<AdminOrdersScreen> createState() => _AdminOrdersScreenState();

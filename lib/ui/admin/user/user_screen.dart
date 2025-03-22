@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
 
 class AdminUsersScreen extends StatefulWidget {
-  static const routeName = '/users';
+  static const routeName = '/admin_users';
   const AdminUsersScreen({super.key});
 
   @override

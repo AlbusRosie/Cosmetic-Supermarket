@@ -8,7 +8,7 @@ import 'products_manager.dart';
 import '../shared/app_drawer.dart';
 
 class AdminProductsScreen extends StatefulWidget {
-  static const routeName = '/product_screen';
+  static const routeName = '/admin_product_screen';
   const AdminProductsScreen({super.key});
 
   @override
