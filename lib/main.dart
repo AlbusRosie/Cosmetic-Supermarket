@@ -127,12 +127,16 @@ class Larana extends StatelessWidget {
                 : const SplashScreen(),
             routes: {
               //**********Customer*************/
-              CartScreen.routeName: (ctx) => const SafeArea(child: CartScreen()),
-              OrdersScreen.routeName: (ctx) => const SafeArea(child: OrdersScreen()),
-              
+              CartScreen.routeName: (ctx) =>
+                  const SafeArea(child: CartScreen()),
+              OrdersScreen.routeName: (ctx) =>
+                  const SafeArea(child: OrdersScreen()),
+
               //**********Admin*************/
-              AuthScreen.routeName: (ctx) => const SafeArea(child: AuthScreen()),
-              AdminProductsScreen.routeName: (ctx) => const AdminProductsScreen(),
+              AuthScreen.routeName: (ctx) =>
+                  const SafeArea(child: AuthScreen()),
+              AdminProductsScreen.routeName: (ctx) =>
+                  const AdminProductsScreen(),
               AddProductScreen.routeName: (ctx) => const AddProductScreen(),
               AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
               EditProductScreen.routeName: (ctx) => EditProductScreen(),

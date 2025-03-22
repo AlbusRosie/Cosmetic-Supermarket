@@ -33,7 +33,8 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchUsers = Provider.of<AdminUserManager>(context, listen: false).adminFetchUsers();
+    _fetchUsers =
+        Provider.of<AdminUserManager>(context, listen: false).adminFetchUsers();
   }
 
   @override
@@ -303,19 +304,19 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start, 
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             '$label:',
             style: TextStyle(color: color4, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: 10), 
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
               style: TextStyle(color: color4),
               textAlign: TextAlign.right,
-              softWrap: true, 
+              softWrap: true,
             ),
           ),
         ],

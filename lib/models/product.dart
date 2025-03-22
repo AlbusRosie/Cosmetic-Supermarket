@@ -27,7 +27,6 @@ class Product {
 
   Product copyWith({
     String? pid,
-    String? pname,
     String? title,
     String? description,
     double? price,
@@ -40,7 +39,7 @@ class Product {
   }) {
     return Product(
       pid: pid ?? this.pid,
-      title: pname ?? this.title,
+      title: title ?? this.title,
       description: description ?? this.description,
       price: price ?? this.price,
       featuredImage: featuredImage ?? this.featuredImage,

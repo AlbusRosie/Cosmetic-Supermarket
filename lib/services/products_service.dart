@@ -93,10 +93,10 @@ class ProductsService {
     try {
       final pb = await getPocketbaseInstance();
       final productModel = await pb!.collection('products').update(
-            product.pid!, // Use pid instead of id
+            product.pid!,  
             body: {
               ...product.toJson(),
-              'stockQuantity': product.stockQuantity, // Add stockQuantity
+              'stockQuantity': product.stockQuantity, 
             },
             files: product.featuredImage != null
                 ? [

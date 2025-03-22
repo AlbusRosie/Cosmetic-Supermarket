@@ -1,5 +1,5 @@
 import 'cart_item.dart';
-import 'user.dart'; // Import User model
+import 'user.dart'; 
 
 class OrderItem {
   final String? id;
@@ -8,7 +8,7 @@ class OrderItem {
   final DateTime dateTime;
   final String status;
   final String? userId;
-  final User? user; // Thêm user object
+  final User? user; 
 
   int get productCount => products.length;
 
@@ -19,7 +19,7 @@ class OrderItem {
     DateTime? dateTime,
     this.status = 'confirmed',
     this.userId,
-    this.user, // Khởi tạo user
+    this.user, 
   }) : dateTime = dateTime ?? DateTime.now();
 
   OrderItem copyWith({
@@ -29,7 +29,7 @@ class OrderItem {
     DateTime? dateTime,
     String? status,
     String? userId,
-    User? user, // Thêm user trong copyWith
+    User? user,
   }) {
     return OrderItem(
       id: id ?? this.id,
@@ -50,7 +50,7 @@ class OrderItem {
       'products': products.map((p) => p.toJson()).toList(),
       'status': status,
       'userId': userId,
-      'user': user?.toJson(), // Serialize User object
+      'user': user?.toJson(), 
     };
   }
 
@@ -66,7 +66,7 @@ class OrderItem {
       userId: json['userId'],
       user: json['user'] != null
           ? User.fromJson(json['user'])
-          : null, // Deserialize User
+          : null,
     );
   }
 }

@@ -25,16 +25,93 @@ class _AuthCardState extends State<AuthCard> {
   };
   final _isSubmitting = ValueNotifier<bool>(false);
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true; 
+  final _confirmPasswordController =
+      TextEditingController(); // Added controller
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true; // Added for independent toggle
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<bool> _validateFields() async {
+    final email = _authData['email'] ?? '';
+    final password = _authData['password'] ?? '';
+    final username = _authData['username'] ?? '';
+    final phone = _authData['phone'] ?? '';
+    final confirmPassword = _confirmPasswordController.text;
+
+    // Validate email (for both login and signup)
+    if (email.isEmpty || !email.contains('@')) {
+      await showErrorDialog(context, 'Invalid email!');
+      return false;
+    }
+
+    // Validate password (for both login and signup)
+    if (password.isEmpty) {
+      await showErrorDialog(context, 'Please enter a password');
+      return false;
+    }
+    if (password.length < 8) {
+      await showErrorDialog(
+          context, 'Password must be at least 8 characters long');
+      return false;
+    }
+
+    // Additional validations for signup mode
+    if (_authMode == AuthMode.signup) {
+      // Validate username
+      if (username.isEmpty) {
+        await showErrorDialog(context, 'Username cannot be blank!');
+        return false;
+      }
+      if (username.length <= 3) {
+        await showErrorDialog(
+            context, 'Username must be more than 3 characters long');
+        return false;
+      }
+
+      // Validate phone
+      if (phone.isEmpty) {
+        await showErrorDialog(context, 'Phone cannot be blank!');
+        return false;
+      }
+      final phoneRegex = RegExp(r'^0\d{9}$');
+      if (!phoneRegex.hasMatch(phone)) {
+        await showErrorDialog(context,
+            'Phone number must be exactly 10 digits and start with 0 (e.g., 0123456789)');
+        return false;
+      }
+
+      // Validate confirm password
+      if (confirmPassword.isEmpty) {
+        await showErrorDialog(context, 'Please confirm your password');
+        return false;
+      }
+      if (confirmPassword != password) {
+        await showErrorDialog(context, 'Passwords do not match');
+        return false;
+      }
+    }
+
+    return true; // All validations passed
+  }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
     _formKey.currentState!.save();
     _isSubmitting.value = true;
 
     print('✅ Auth data after save: $_authData');
+
+    // Validate fields and show errors in popup if validation fails
+    final isValid = await _validateFields();
+    if (!isValid) {
+      _isSubmitting.value = false;
+      return;
+    }
 
     try {
       if (_authMode == AuthMode.login) {
@@ -54,7 +131,12 @@ class _AuthCardState extends State<AuthCard> {
     } catch (error) {
       log('$error');
       if (mounted) {
-        showErrorDialog(context, error.toString());
+        // Clean up error message to remove redundant "Exception: " prefix
+        String errorMessage = error.toString();
+        while (errorMessage.startsWith('Exception: ')) {
+          errorMessage = errorMessage.substring('Exception: '.length);
+        }
+        showErrorDialog(context, errorMessage);
       }
     }
     _isSubmitting.value = false;
@@ -142,12 +224,6 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Username",
       icon: Icons.person,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Username cannot be blank!';
-        }
-        return null;
-      },
       onSaved: (value) => _authData['username'] = value!,
     );
   }
@@ -156,12 +232,6 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Phone",
       icon: Icons.phone,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Phone cannot be blank!';
-        }
-        return null;
-      },
       onSaved: (value) => _authData['phone'] = value!,
     );
   }
@@ -170,12 +240,6 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Email",
       icon: Icons.email,
-      validator: (value) {
-        if (value == null || value.isEmpty || !value.contains('@')) {
-          return 'Invalid email!';
-        }
-        return null;
-      },
       onSaved: (value) => _authData['email'] = value!,
     );
   }
@@ -184,14 +248,8 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Password",
       icon: Icons.lock,
-      obscureText: _obscurePassword, 
+      obscureText: _obscurePassword,
       controller: _passwordController,
-      validator: (value) {
-        if (value == null || value.length < 5) {
-          return 'Password is too short!';
-        }
-        return null;
-      },
       onSaved: (value) => _authData['password'] = value!,
       suffixIcon: IconButton(
         icon: Icon(
@@ -200,7 +258,7 @@ class _AuthCardState extends State<AuthCard> {
         ),
         onPressed: () {
           setState(() {
-            _obscurePassword = !_obscurePassword; 
+            _obscurePassword = !_obscurePassword;
           });
         },
       ),
@@ -211,21 +269,16 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Confirm Password",
       icon: Icons.lock_reset,
-      obscureText: _obscurePassword, 
-      validator: (value) {
-        if (value != _passwordController.text) {
-          return 'Passwords do not match!';
-        }
-        return null;
-      },
+      obscureText: _obscureConfirmPassword,
+      controller: _confirmPasswordController,
       suffixIcon: IconButton(
         icon: Icon(
-          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+          _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
           color: color1,
         ),
         onPressed: () {
           setState(() {
-            _obscurePassword = !_obscurePassword; 
+            _obscureConfirmPassword = !_obscureConfirmPassword;
           });
         },
       ),
@@ -286,9 +339,8 @@ class _AuthCardState extends State<AuthCard> {
     required IconData icon,
     bool obscureText = false,
     TextEditingController? controller,
-    String? Function(String?)? validator,
     void Function(String?)? onSaved,
-    Widget? suffixIcon, // Added to support the eye icon
+    Widget? suffixIcon,
   }) {
     return TextFieldContainer(
       child: TextFormField(
@@ -306,9 +358,8 @@ class _AuthCardState extends State<AuthCard> {
           hintStyle: const TextStyle(color: color1),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 20),
-          suffixIcon: suffixIcon, // Add the eye icon here
+          suffixIcon: suffixIcon,
         ),
-        validator: validator,
         onSaved: onSaved,
       ),
     );

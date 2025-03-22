@@ -45,7 +45,7 @@ class AdminProductsManager with ChangeNotifier {
     }
   }
 
-Future<void> updateProduct(Product product) async {
+  Future<void> updateProduct(Product product) async {
     final index = _items.indexWhere((item) => item.pid == product.pid);
     if (index >= 0) {
       final updatedProduct = await _productsService.updateProduct(product);

@@ -17,10 +17,10 @@ class AuthScreen extends StatelessWidget {
             Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 0.0), 
+                  padding: const EdgeInsets.only(top: 0.0),
                   child: SizedBox(
                     width: size.width,
-                    height: size.height / 3.75, 
+                    height: size.height / 3.75,
                     child: Image.asset(
                       "assets/images/logo.png",
                       fit: BoxFit.contain,

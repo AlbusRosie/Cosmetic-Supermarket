@@ -23,6 +23,7 @@ class UsersService {
       }
       final userModel = await pb.collection('users').getOne(userId);
       final userJson = userModel.toJson();
+      print('❤️❤️❤️ Fetched user data from PocketBase: $userJson'); 
       return User.fromJson({
         ...userJson,
         'avatar': _getAvatarUrl(pb, userModel),
@@ -44,6 +45,8 @@ class UsersService {
       }
       final updateData = {
         'username': user.username,
+        'phone': user.phone,
+        'address': user.address,
         'updated': DateTime.now().toIso8601String(),
       };
 
@@ -69,7 +72,7 @@ class UsersService {
         'email': updatedUserModel.getStringValue('email'),
       });
     } catch (error) {
-      print('Error updating user: $error');
+      print('❌ Error updating user: $error');
       return null;
     }
   }
@@ -100,7 +103,7 @@ class UsersService {
             ]
           : [];
 
-      final userModel = await pb!.collection('users').create(
+      final userModel = await pb.collection('users').create(
             body: userData,
             files: files,
           );
@@ -108,7 +111,7 @@ class UsersService {
       return User.fromJson({
         ...userModel.toJson(),
         'avatar': _getAvatarUrl(pb, userModel),
-        'email': userModel.getStringValue('email') ?? '',
+        'email': userModel.getStringValue('email'),
       });
     } catch (error) {
       return null;

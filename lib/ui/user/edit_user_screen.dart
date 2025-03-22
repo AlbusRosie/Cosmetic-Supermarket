@@ -29,6 +29,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
   File? _selectedAvatar;
   late UsersManager _usersManager;
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  bool _isLoading =true; 
 
   @override
   void initState() {
@@ -44,8 +48,11 @@ class _EditUserScreenState extends State<EditUserScreen> {
             address: '',
           )
         : widget.user!;
-    _loadUserData();
+    _usernameController.text = _editedUser.username;
     _emailController.text = _editedUser.email;
+    _phoneController.text = _editedUser.phone;
+    _addressController.text = _editedUser.address ?? '';
+    _loadUserData();
   }
 
   Future<void> _loadUserData() async {
@@ -54,7 +61,12 @@ class _EditUserScreenState extends State<EditUserScreen> {
       if (_usersManager.currentUser != null) {
         setState(() {
           _editedUser = _usersManager.currentUser!;
+          print('❤️❤️❤️ Updated _editedUser: ${_editedUser.toJson()}');
+          _usernameController.text = _editedUser.username;
           _emailController.text = _editedUser.email;
+          _phoneController.text = _editedUser.phone;
+          _addressController.text = _editedUser.address ?? '';
+          _isLoading = false; 
         });
       } else {
         if (mounted) {
@@ -126,7 +138,11 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
   @override
   void dispose() {
+    // Dispose of all controllers to prevent memory leaks
     _emailController.dispose();
+    _usernameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
     super.dispose();
   }
 
@@ -141,37 +157,40 @@ class _EditUserScreenState extends State<EditUserScreen> {
         iconTheme: const IconThemeData(color: laranaPink),
       ),
       drawer: const AppDrawer(),
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
-          child: Column(
-            children: [
-              _buildAvatarPreview(),
-              const SizedBox(height: 30),
-              Expanded(
-                child: Form(
-                  key: _editForm,
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: <Widget>[
-                      _buildUsernameField(),
-                      const SizedBox(height: 20),
-                      _buildEmailField(),
-                      const SizedBox(height: 20),
-                      _buildPhoneField(),
-                      const SizedBox(height: 20),
-                      _buildAddressField(),
-                      const SizedBox(height: 30),
-                      _buildActionButtons(),
-                    ],
-                  ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: laranaPink))
+          : Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 30.0, vertical: 20.0),
+                child: Column(
+                  children: [
+                    _buildAvatarPreview(),
+                    const SizedBox(height: 30),
+                    Expanded(
+                      child: Form(
+                        key: _editForm,
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(),
+                          children: <Widget>[
+                            _buildUsernameField(),
+                            const SizedBox(height: 20),
+                            _buildEmailField(),
+                            const SizedBox(height: 20),
+                            _buildPhoneField(),
+                            const SizedBox(height: 20),
+                            _buildAddressField(),
+                            const SizedBox(height: 30),
+                            _buildActionButtons(),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 
@@ -207,10 +226,21 @@ class _EditUserScreenState extends State<EditUserScreen> {
                           ? Image.network(
                               _editedUser.avatar!,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Center(
-                                      child: Icon(Icons.person,
-                                          size: 60, color: laranaPink)),
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: laranaPink,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Error loading avatar: $error');
+                                return const Center(
+                                    child: Icon(Icons.person,
+                                        size: 60, color: laranaPink));
+                              },
                             )
                           : Image.file(
                               _selectedAvatar!,
@@ -263,7 +293,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
   Widget _buildUsernameField() {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
     return TextFormField(
-      initialValue: _editedUser.username,
+      controller: _usernameController,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.account_circle, color: laranaPink),
         hintText: 'Username',
@@ -316,11 +346,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
     );
   }
 
-  // Updated Phone Field
   Widget _buildPhoneField() {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
     return TextFormField(
-      initialValue: _editedUser.phone,
+      controller: _phoneController,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.phone, color: laranaPink),
         hintText: 'Phone (e.g., 0123456789)',
@@ -341,7 +370,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
         if (value!.isEmpty) {
           return 'Please provide a phone number.';
         }
-        // Kiểm tra số điện thoại bắt đầu bằng 0 và có đúng 10 chữ số
         if (!RegExp(r'^0\d{9}$').hasMatch(value)) {
           return 'Please enter a valid Vietnamese phone number (e.g., 0123456789).';
         }
@@ -353,11 +381,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
     );
   }
 
-  // Address Field
   Widget _buildAddressField() {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
     return TextFormField(
-      initialValue: _editedUser.address,
+      controller: _addressController,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.location_on, color: laranaPink),
         hintText: 'Address',

@@ -21,8 +21,8 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
-  final TextEditingController _searchController = TextEditingController(); 
-  String _searchQuery = ''; 
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -53,14 +53,15 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose(); 
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsManager = Provider.of<AdminProductsManager>(context, listen: true);
+    final productsManager =
+        Provider.of<AdminProductsManager>(context, listen: true);
 
     // Lọc sản phẩm dựa trên category và search query
     var filteredProducts = productsManager.items;
@@ -106,8 +107,7 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
                             children: [
                               Expanded(
                                 child: TextField(
-                                  controller:
-                                      _searchController, 
+                                  controller: _searchController,
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
                                     hintText: "Search by product name...",
@@ -266,19 +266,19 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
                 ),
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(
-            AddProductScreen.routeName,
-            arguments: null,
-          );
-        },
-        backgroundColor: color14,
-        child: const Icon(
-          Icons.add,
-          color: color4,
-        ),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Navigator.of(context).pushNamed(
+      //       AddProductScreen.routeName,
+      //       arguments: null,
+      //     );
+      //   },
+      //   backgroundColor: color14,
+      //   child: const Icon(
+      //     Icons.add,
+      //     color: color4,
+      //   ),
+      // ),
     );
   }
 }

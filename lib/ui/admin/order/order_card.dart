@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import '../../../models/order_item.dart';
 import '../../../components/colors.dart';
 
-
 class OrderItemCard extends StatelessWidget {
   final OrderItem order;
   final VoidCallback? onTap;

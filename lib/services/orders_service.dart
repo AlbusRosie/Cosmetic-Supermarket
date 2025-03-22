@@ -198,7 +198,7 @@ class OrdersService {
     }
   }
 // ********************************************************Admin************************************************//
-Future<List<OrderItem>> adminFetchAllOrders() async {
+  Future<List<OrderItem>> adminFetchAllOrders() async {
     final List<OrderItem> orders = [];
     try {
       final pb = await getPocketbaseInstance();

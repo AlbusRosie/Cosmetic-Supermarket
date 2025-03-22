@@ -116,7 +116,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
     }
   }
-
   Future<void> _pickImage() async {
     final imagePicker = ImagePicker();
     try {

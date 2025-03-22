@@ -29,29 +29,32 @@ class AuthService {
   }
 
   Future<User> signup(
-      String username, String email, String phone, String password) async {
-    final pb = await getPocketbaseInstance();
-    if (pb == null) {
-      throw Exception("PocketBase not initialized. Please restart the app.");
-    }
-
-    try {
-      // Check if the email already exists
-      final existingEmailUsers = await pb.collection('users').getList(
-            filter: 'email = "$email"',
-          );
-      if (existingEmailUsers.items.isNotEmpty) {
-        throw ("This email is already registered. Please use a different one.");
+    String username, String email, String phone, String password) async {
+      final pb = await getPocketbaseInstance();
+      if (pb == null) {
+        throw Exception("PocketBase not initialized. Please restart the app.");
       }
 
-      // Check if the phone number already exists
-      final existingPhoneUsers = await pb.collection('users').getList(
-            filter: 'phone = "$phone"',
-          );
-      if (existingPhoneUsers.items.isNotEmpty) {
-        throw ("This phone number is already in use. Please use a different one.");
-      }
-      print('Creating user: $email');
+      try {
+        // Check if the email already exists
+        final existingEmailUsers = await pb.collection('users').getList(
+              filter: 'email = "$email"',
+            );
+        if (existingEmailUsers.items.isNotEmpty) {
+          throw Exception(
+              "This email is already registered. Please use a different one.");
+        }
+
+        // Check if the phone number already exists
+        final existingPhoneUsers = await pb.collection('users').getList(
+              filter: 'phone = "$phone"',
+            );
+        if (existingPhoneUsers.items.isNotEmpty) {
+          throw Exception(
+              "This phone number is already in use. Please use a different one.");
+        }
+
+        print('Creating user: $email');
 
       final record = await pb.collection('users').create(body: {
         'username': username,
@@ -74,6 +77,13 @@ class AuthService {
       if (error is ClientException) {
         print('PocketBase error response: ${error.response}');
         final errorMessage = error.response['message'] ?? 'Registration failed';
+        throw Exception(errorMessage);
+      }
+      if (error is Exception) {
+        String errorMessage = error.toString();
+        if (errorMessage.startsWith('Exception: ')) {
+          errorMessage = errorMessage.substring('Exception: '.length);
+        }
         throw Exception(errorMessage);
       }
       throw Exception(error.toString());
