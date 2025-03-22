@@ -19,12 +19,12 @@ import 'ui/orders/orders_screen.dart';
 import 'ui/admin/auth/auth_manager.dart';
 import 'ui/admin/products/products_screen.dart';
 import 'ui/admin/order/order_screen.dart';
-import 'ui/admin/user/user_screen.dart';
+import 'ui/admin/user/adminUser_screen.dart';
 import 'ui/products/user_products_screen.dart';
 import 'ui/admin/auth/auth_screen.dart';
 import 'ui/admin/products/add_product.dart';
 import 'ui/admin/order/order_manager.dart';
-import 'ui/admin/user/user_manager.dart';
+import 'ui/admin/user/adminUser_manager.dart';
 import 'ui/admin/products/products_manager.dart';
 
 Future<void> main() async {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../models/user.dart';
-import '../shared/app_drawer.dart';
-import 'user_manager.dart';
+import '../../shared/app_drawer.dart';
+import 'adminUser_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
 
 class AdminUsersScreen extends StatefulWidget {
-  static const routeName = '/users';
+  static const routeName = '/admin_users';
   const AdminUsersScreen({super.key});
 
   @override
@@ -46,7 +46,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AdminAppDrawer(),
+      drawer: const AppDrawer(),
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
@@ -78,6 +78,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                               border: InputBorder.none,
                               hintText: "Search customers...",
                               hintStyle:
+                                  // ignore: deprecated_member_use
                                   TextStyle(color: color4.withOpacity(0.7)),
                             ),
                             style: TextStyle(color: color4),

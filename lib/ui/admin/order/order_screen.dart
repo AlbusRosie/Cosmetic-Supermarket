@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../models/order_item.dart';
-import '../shared/app_drawer.dart';
+import '../../shared/app_drawer.dart';
 import 'order_manager.dart';
 import 'order_card.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +8,7 @@ import '../../../components/colors.dart';
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
-  static const routeName = '/orders';
+  static const routeName = '/admin_orders';
 
   @override
   State<AdminOrdersScreen> createState() => _AdminOrdersScreenState();
@@ -47,7 +47,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AdminAppDrawer(),
+      drawer: const AppDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -235,7 +235,224 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 
-  void _showOrderDetailsPopup(
+  // void _showOrderDetailsPopup(
+  //     BuildContext context, OrderItem order, AdminOrdersManager ordersManager) {
+  //   String newStatus = order.status;
+  //   final totalQuantity =
+  //       order.products.fold<int>(0, (sum, product) => sum + (product.quantity));
+
+  //   // Function to truncate product title if it's too long
+  //   String truncateProductTitle(String title, {int maxLength = 20}) {
+  //     if (title.length <= maxLength) {
+  //       return title;
+  //     }
+  //     return '${title.substring(0, maxLength)}...';
+  //   }
+
+  //   showDialog(
+  //     context: context,
+  //     builder: (ctx) => Dialog(
+  //       backgroundColor: color13,
+  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //       child: Stack(
+  //         children: [
+  //           SingleChildScrollView(
+  //             child: Padding(
+  //               padding: const EdgeInsets.all(20.0),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   const SizedBox(height: 10),
+  //                   Text(
+  //                     "Order ID: ${order.id}",
+  //                     style: TextStyle(
+  //                       fontWeight: FontWeight.w500,
+  //                       color: color4,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 10),
+  //                   Text(
+  //                     "Name: ${order.user?.username}",
+  //                     style: TextStyle(
+  //                       fontWeight: FontWeight.bold,
+  //                       color: color4,
+  //                     ),
+  //                   ),
+  //                   Text(
+  //                     "Phone: ${order.user?.phone}",
+  //                     style: TextStyle(color: color4),
+  //                   ),
+  //                   const Divider(),
+  //                   Text(
+  //                     "Items:",
+  //                     style: TextStyle(
+  //                       fontWeight: FontWeight.bold,
+  //                       color: color4,
+  //                     ),
+  //                   ),
+  //                   // Add a constrained height and scrollbar for the product list
+  //                   Container(
+  //                     constraints: BoxConstraints(
+  //                       maxHeight: order.products.length > 3
+  //                           ? 120 // Set a max height for more than 3 products
+  //                           : double
+  //                               .infinity, // No height constraint if 3 or fewer products
+  //                     ),
+  //                     child: Scrollbar(
+  //                       thumbVisibility: order.products.length >
+  //                           3, // Show scrollbar only if more than 3 products
+  //                       child: SingleChildScrollView(
+  //                         child: Column(
+  //                           children: order.products.map((prod) {
+  //                             return Padding(
+  //                               padding:
+  //                                   const EdgeInsets.symmetric(vertical: 4.0),
+  //                               child: Row(
+  //                                 mainAxisAlignment:
+  //                                     MainAxisAlignment.spaceBetween,
+  //                                 children: [
+  //                                   // Truncate the product title if it's too long
+  //                                   SizedBox(
+  //                                     width:
+  //                                         200, // Constrain the width to ensure truncation works
+  //                                     child: Text(
+  //                                       "${prod.quantity}x ${truncateProductTitle(prod.title)}",
+  //                                       style: TextStyle(color: color4),
+  //                                       overflow: TextOverflow
+  //                                           .ellipsis, // Fallback in case of overflow
+  //                                     ),
+  //                                   ),
+  //                                   Text(
+  //                                     "\$${prod.price.toStringAsFixed(2)}",
+  //                                     style: TextStyle(color: color4),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             );
+  //                           }).toList(),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const Divider(),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         "Total Quantity:",
+  //                         style: TextStyle(color: color4),
+  //                       ),
+  //                       Text(
+  //                         "$totalQuantity",
+  //                         style: TextStyle(color: color4),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text(
+  //                         "Total Amount:",
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: color4,
+  //                         ),
+  //                       ),
+  //                       Text(
+  //                         "\$${order.amount.toStringAsFixed(2)}",
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.bold,
+  //                           color: color4,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   const Divider(),
+  //                   if (order.status == 'confirmed') ...[
+  //                     const SizedBox(height: 10),
+  //                     Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                       children: [
+  //                         Text(
+  //                           "Update Status:",
+  //                           style: TextStyle(
+  //                             fontWeight: FontWeight.bold,
+  //                             color: color4,
+  //                           ),
+  //                         ),
+  //                         DropdownButton<String>(
+  //                           value: newStatus,
+  //                           items: const [
+  //                             DropdownMenuItem(
+  //                               value: 'confirmed',
+  //                               child: Text('Confirmed'),
+  //                             ),
+  //                             DropdownMenuItem(
+  //                               value: 'completed',
+  //                               child: Text('Completed'),
+  //                             ),
+  //                             DropdownMenuItem(
+  //                               value: 'canceled',
+  //                               child: Text('Canceled'),
+  //                             ),
+  //                           ],
+  //                           onChanged: (String? value) async {
+  //                             if (value != null && value != order.status) {
+  //                               setState(() => _isLoading = true);
+  //                               await ordersManager.adminUpdateOrderStatus(
+  //                                   order.id!, value);
+  //                               setState(() => _isLoading = false);
+  //                               Navigator.of(ctx).pop();
+  //                               setState(() {
+  //                                 _fetchOrders = Provider.of<AdminOrdersManager>(
+  //                                         context,
+  //                                         listen: false)
+  //                                     .adminFetchAllOrders();
+  //                               });
+  //                             }
+  //                           },
+  //                           style: TextStyle(color: color4),
+  //                           dropdownColor: color13,
+  //                           underline: Container(),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ] else ...[
+  //                     const SizedBox(height: 10),
+  //                     Row(
+  //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                       children: [
+  //                         Text(
+  //                           "Status: ${order.status}",
+  //                           style: TextStyle(
+  //                             fontWeight: FontWeight.bold,
+  //                             color: color4,
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ],
+  //                   const SizedBox(height: 10),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //           Positioned(
+  //             right: 10,
+  //             top: 10,
+  //             child: IconButton(
+  //               icon: Icon(Icons.close, color: color4, size: 28),
+  //               onPressed: () => Navigator.of(ctx).pop(),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+void _showOrderDetailsPopup(
       BuildContext context, OrderItem order, AdminOrdersManager ordersManager) {
     String newStatus = order.status;
     final totalQuantity =
@@ -369,52 +586,80 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       ],
                     ),
                     const Divider(),
-                    if (order.status == 'Confirmed') ...[
+                    if (order.status == 'confirmed') ...[
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Update Status:",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: color4,
-                            ),
-                          ),
-                          DropdownButton<String>(
-                            value: newStatus,
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'Confirmed',
-                                child: Text('Confirmed'),
+                          Row(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () async {
+                                  if (order.status != 'completed') {
+                                    setState(() => _isLoading = true);
+                                    await ordersManager.adminUpdateOrderStatus(
+                                        order.id!, 'completed');
+                                    setState(() => _isLoading = false);
+                                    Navigator.of(ctx).pop();
+                                    setState(() {
+                                      _fetchOrders =
+                                          Provider.of<AdminOrdersManager>(
+                                                  context,
+                                                  listen: false)
+                                              .adminFetchAllOrders();
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 97, 202, 100), // Green for "Completed"
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Completed',
+                                  style: TextStyle(fontSize: 14),
+                                ),
                               ),
-                              DropdownMenuItem(
-                                value: 'Completed',
-                                child: Text('Completed'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'Canceled',
-                                child: Text('Canceled'),
+                              const SizedBox(
+                                  width: 8), // Spacing between buttons
+                              ElevatedButton(
+                                onPressed: () async {
+                                  if (order.status != 'canceled') {
+                                    setState(() => _isLoading = true);
+                                    await ordersManager.adminUpdateOrderStatus(
+                                        order.id!, 'canceled');
+                                    setState(() => _isLoading = false);
+                                    Navigator.of(ctx).pop();
+                                    setState(() {
+                                      _fetchOrders =
+                                          Provider.of<AdminOrdersManager>(
+                                                  context,
+                                                  listen: false)
+                                              .adminFetchAllOrders();
+                                    });
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 218, 104, 96), // Red for "Canceled"
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Canceled',
+                                  style: TextStyle(fontSize: 14),
+                                ),
                               ),
                             ],
-                            onChanged: (String? value) async {
-                              if (value != null && value != order.status) {
-                                setState(() => _isLoading = true);
-                                await ordersManager.adminUpdateOrderStatus(
-                                    order.id!, value);
-                                setState(() => _isLoading = false);
-                                Navigator.of(ctx).pop();
-                                setState(() {
-                                  _fetchOrders = Provider.of<AdminOrdersManager>(
-                                          context,
-                                          listen: false)
-                                      .adminFetchAllOrders();
-                                });
-                              }
-                            },
-                            style: TextStyle(color: color4),
-                            dropdownColor: color13,
-                            underline: Container(),
                           ),
                         ],
                       ),
@@ -451,4 +696,5 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       ),
     );
   }
+
 }

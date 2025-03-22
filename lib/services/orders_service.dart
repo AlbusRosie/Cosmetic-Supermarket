@@ -309,7 +309,6 @@ Future<List<OrderItem>> adminFetchAllOrders() async {
       final orderModel = await pb!.collection('orders').update(
         order.id!,
         body: {
-          'amount': order.amount,
           'dateTime': order.dateTime.toIso8601String(),
           'status': order.status,
         },

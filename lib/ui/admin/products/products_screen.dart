@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
 import '../../../models/product.dart';
+import '../../shared/app_drawer.dart';
+import '../../shared/dialog_utils.dart';
 import 'add_product.dart';
 import 'edit_product.dart';
 import 'products_manager.dart';
-import '../shared/app_drawer.dart';
 
 class AdminProductsScreen extends StatefulWidget {
-  static const routeName = '/product_screen';
+  static const routeName = '/admin_product_screen';
   const AdminProductsScreen({super.key});
 
   @override
@@ -77,7 +78,7 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AdminAppDrawer(),
+      drawer: AppDrawer(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -356,27 +357,9 @@ class ProductItem extends StatelessWidget {
                         IconButton(
                           icon: Icon(Icons.delete, color: color7, size: 20),
                           onPressed: () async {
-                            final confirm = await showDialog(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: Text("Confirm Delete"),
-                                content: Text(
-                                    "Are you sure you want to delete this product?"),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Cancel"),
-                                    onPressed: () {
-                                      Navigator.of(ctx).pop(false);
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text("Delete"),
-                                    onPressed: () {
-                                      Navigator.of(ctx).pop(true);
-                                    },
-                                  ),
-                                ],
-                              ),
+                            final confirm = await showConfirmDialog(
+                              context,
+                              'Do you want to delete this product?',
                             );
 
                             if (confirm == true) {
