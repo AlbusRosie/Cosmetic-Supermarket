@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../../../models/product.dart';
 import '../../../services/products_service.dart';
 
-class ProductsManager with ChangeNotifier {
+class AdminProductsManager with ChangeNotifier {
   final ProductsService _productsService = ProductsService();
   List<Product> _items = [];
   List<String> _categories = [];

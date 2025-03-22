@@ -6,15 +6,15 @@ import 'order_card.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
 
-class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({super.key});
+class AdminOrdersScreen extends StatefulWidget {
+  const AdminOrdersScreen({super.key});
   static const routeName = '/orders';
 
   @override
-  State<OrdersScreen> createState() => _OrdersScreenState();
+  State<AdminOrdersScreen> createState() => _AdminOrdersScreenState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen> {
+class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   late Future<void> _fetchOrders;
   final ScrollController _scrollController = ScrollController();
   String _selectedStatus = 'All';
@@ -33,7 +33,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _fetchOrders =
-        Provider.of<OrdersManager>(context, listen: false).fetchAllOrders();
+        Provider.of<AdminOrdersManager>(context, listen: false).adminFetchAllOrders();
   }
 
   @override
@@ -47,7 +47,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: const AdminAppDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -165,7 +165,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 child: Text("Error: ${snapshot.error}",
                                     style: TextStyle(color: Colors.grey[600])));
                           } else {
-                            return Consumer<OrdersManager>(
+                            return Consumer<AdminOrdersManager>(
                               builder: (ctx, ordersManager, child) {
                                 var filteredOrders = ordersManager.orders;
                                 print(
@@ -236,7 +236,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   void _showOrderDetailsPopup(
-      BuildContext context, OrderItem order, OrdersManager ordersManager) {
+      BuildContext context, OrderItem order, AdminOrdersManager ordersManager) {
     String newStatus = order.status;
     final totalQuantity =
         order.products.fold<int>(0, (sum, product) => sum + (product.quantity));
@@ -400,15 +400,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             onChanged: (String? value) async {
                               if (value != null && value != order.status) {
                                 setState(() => _isLoading = true);
-                                await ordersManager.updateOrderStatus(
+                                await ordersManager.adminUpdateOrderStatus(
                                     order.id!, value);
                                 setState(() => _isLoading = false);
                                 Navigator.of(ctx).pop();
                                 setState(() {
-                                  _fetchOrders = Provider.of<OrdersManager>(
+                                  _fetchOrders = Provider.of<AdminOrdersManager>(
                                           context,
                                           listen: false)
-                                      .fetchAllOrders();
+                                      .adminFetchAllOrders();
                                 });
                               }
                             },

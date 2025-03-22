@@ -5,7 +5,7 @@ class CartsService {
   Future<String> _fetchProductImage(String productId) async {
     try {
       final pb = await getPocketbaseInstance();
-      final productModel = await pb.collection('products').getOne(productId);
+      final productModel = await pb!.collection('products').getOne(productId);
       final featuredImageName = productModel.getStringValue('featuredImage');
 
       return pb.files.getUrl(productModel, featuredImageName).toString();
@@ -16,7 +16,7 @@ class CartsService {
   Future<int> checkStockQuantity(String productId) async {
     try {
       final pb = await getPocketbaseInstance();
-      final productRecord = await pb.collection('products').getOne(productId);
+      final productRecord = await pb!.collection('products').getOne(productId);
       final stockQuantity = productRecord.data['stockQuantity'] ?? 0;
       return stockQuantity;
     } catch (error) {
@@ -26,7 +26,7 @@ class CartsService {
   Future<CartItem?> addCartItem(CartItem cartItem) async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       final productRecord =await pb.collection('products').getOne(cartItem.productId);
       final stockQuantity = productRecord.data['stockQuantity'] ?? 0;
       final existingItems = await pb.collection('carts').getFullList(
@@ -73,7 +73,7 @@ class CartsService {
 
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record!.id;
+      final userId = pb!.authStore.record!.id;
       String filter;
       if (filteredByUser) {
         filter = "userId='$userId' && status='pending'";
@@ -99,7 +99,7 @@ class CartsService {
   Future<CartItem?> updateCartItem(CartItem cartItem) async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       if (userId == null) {
         throw Exception('User not authenticated.');
       }
@@ -126,7 +126,7 @@ class CartsService {
   Future<bool> deleteCartItem(String id) async {
     try {
       final pb = await getPocketbaseInstance();
-      await pb.collection('carts').delete(id);
+      await pb!.collection('carts').delete(id);
       return true;
     } catch (error) {
       return false;

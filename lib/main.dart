@@ -1,21 +1,31 @@
-import 'package:ct312h_project/components/colors.dart';
-import 'package:ct312h_project/models/user.dart';
-import 'package:ct312h_project/ui/admin/auth/auth_manager.dart';
-import 'package:ct312h_project/ui/admin/order/order_manager.dart';
-import 'package:ct312h_project/ui/admin/order/order_screen.dart';
-import 'package:ct312h_project/ui/admin/products/edit_product.dart';
-import 'package:ct312h_project/ui/admin/products/products_manager.dart';
-import 'package:ct312h_project/ui/admin/products/products_screen.dart';
-import 'package:ct312h_project/ui/admin/products/add_product.dart';
-import 'package:ct312h_project/ui/admin/auth/auth_screen.dart';
-import 'package:ct312h_project/ui/admin/user/user_manager.dart';
-import 'package:ct312h_project/ui/admin/user/user_screen.dart';
-import 'package:ct312h_project/ui/screens.dart';
-import 'package:ct312h_project/ui/home.dart';
-import 'package:ct312h_project/ui/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'ui/splash_screen.dart';
+
+//*************Customer************** */
+import 'ui/products/products_manager.dart';
+import 'ui/user/edit_user_screen.dart';
+import 'ui/admin/products/edit_product.dart';
+import 'models/user.dart';
+import 'components/colors.dart';
+import 'ui/cart/cart_manager.dart';
+import 'ui/orders/orders_manager.dart';
+import 'ui/user/users_manager.dart';
+import 'ui/cart/cart_screen.dart';
+import 'ui/orders/orders_screen.dart';
+
+//*************Admin************** */
+import 'ui/admin/auth/auth_manager.dart';
+import 'ui/admin/products/products_screen.dart';
+import 'ui/admin/order/order_screen.dart';
+import 'ui/admin/user/user_screen.dart';
+import 'ui/products/user_products_screen.dart';
+import 'ui/admin/auth/auth_screen.dart';
+import 'ui/admin/products/add_product.dart';
+import 'ui/admin/order/order_manager.dart';
+import 'ui/admin/user/user_manager.dart';
+import 'ui/admin/products/products_manager.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -87,12 +97,17 @@ class Larana extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => AuthManager()),
+        //*********Customer********** */
         ChangeNotifierProvider(create: (ctx) => ProductsManager()),
         ChangeNotifierProvider(create: (ctx) => CartManager()),
         ChangeNotifierProvider(create: (ctx) => OrdersManager()),
-        ChangeNotifierProvider(create: (ctx) => UserManager()),
         ChangeNotifierProvider(create: (ctx) => UsersManager()),
+
+        //*********Admin********** */
+        ChangeNotifierProvider(create: (ctx) => AuthManager()),
+        ChangeNotifierProvider(create: (ctx) => AdminProductsManager()),
+        ChangeNotifierProvider(create: (ctx) => AdminOrdersManager()),
+        ChangeNotifierProvider(create: (ctx) => AdminUserManager()),
       ],
       child: Consumer<AuthManager>(
         builder: (ctx, authManager, child) {
@@ -106,31 +121,27 @@ class Larana extends StatelessWidget {
             home: authManager.isInitialized
                 ? (authManager.isAuth
                     ? (authManager.isStaff
-                        ? const ProductsScreen()
-                        : const HomeScreen())
-                    : FutureBuilder(
-                        future: authManager.tryAutoLogin(),
-                        builder: (ctx, snapshot) {
-                          return snapshot.connectionState ==
-                                  ConnectionState.waiting
-                              ? const SafeArea(child: SplashScreen())
-                              : const SafeArea(child: AuthScreen());
-                        },
-                      ))
-                : const SafeArea(child: SplashScreen()),
+                        ? const AdminProductsScreen()
+                        : const UserProductsScreen())
+                    : const AuthScreen())
+                : const SplashScreen(),
             routes: {
-              AuthScreen.routeName: (ctx) => const SafeArea(child: AuthScreen()),
+              //**********Customer*************/
               CartScreen.routeName: (ctx) => const SafeArea(child: CartScreen()),
               OrdersScreen.routeName: (ctx) => const SafeArea(child: OrdersScreen()),
-              ProductsScreen.routeName: (ctx) => const ProductsScreen(),
+              
+              //**********Admin*************/
+              AuthScreen.routeName: (ctx) => const SafeArea(child: AuthScreen()),
+              AdminProductsScreen.routeName: (ctx) => const AdminProductsScreen(),
               AddProductScreen.routeName: (ctx) => const AddProductScreen(),
-              HomeScreen.routeName: (ctx) => const HomeScreen(),
-              UsersScreen.routeName: (ctx) => const UsersScreen(),
+              AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
+              EditProductScreen.routeName: (ctx) => EditProductScreen(),
+              AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
             },
             onGenerateRoute: _onGenerateRoute,
             onUnknownRoute: (settings) {
               return MaterialPageRoute(
-                builder: (ctx) => const ProductsScreen(),
+                builder: (ctx) => const UserProductsScreen(),
               );
             },
           );

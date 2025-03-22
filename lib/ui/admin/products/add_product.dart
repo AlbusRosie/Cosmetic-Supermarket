@@ -82,7 +82,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     });
 
     try {
-      final productsManager = context.read<ProductsManager>();
+      final productsManager = context.read<AdminProductsManager>();
 
       // Log what we're saving to help with debugging
       print('✅ Saving product with category: ${_editedProduct.category}');
@@ -97,7 +97,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
       if (mounted) {
         Navigator.of(context).pushNamed(
-          ProductsScreen.routeName,
+          AdminProductsScreen.routeName,
         );
       }
     } catch (error) {

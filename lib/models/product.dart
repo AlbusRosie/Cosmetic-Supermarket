@@ -73,7 +73,7 @@ class Product {
       pid: json['id'] ,
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      price: json['price'] ?? 0.0,
+      price: (json['price'] is int)? (json['price'] as int).toDouble() : (json['price'] ?? 0.0),
       isFavorite: json['isFavorite'] ?? false,
       imageUrl: json['imageUrl'] ?? '',
       stockQuantity: json['stockQuantity'] ?? 0,

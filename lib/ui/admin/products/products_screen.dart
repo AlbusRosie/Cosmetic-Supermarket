@@ -7,15 +7,15 @@ import 'edit_product.dart';
 import 'products_manager.dart';
 import '../shared/app_drawer.dart';
 
-class ProductsScreen extends StatefulWidget {
+class AdminProductsScreen extends StatefulWidget {
   static const routeName = '/product_screen';
-  const ProductsScreen({super.key});
+  const AdminProductsScreen({super.key});
 
   @override
-  State<ProductsScreen> createState() => _ProductScreenState();
+  State<AdminProductsScreen> createState() => _AdminProductScreenState();
 }
 
-class _ProductScreenState extends State<ProductsScreen> {
+class _AdminProductScreenState extends State<AdminProductsScreen> {
   String? _selectedCategory;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = true;
@@ -41,7 +41,7 @@ class _ProductScreenState extends State<ProductsScreen> {
     });
 
     final productsManager =
-        Provider.of<ProductsManager>(context, listen: false);
+        Provider.of<AdminProductsManager>(context, listen: false);
     await productsManager.fetchCategories(); // First fetch categories
     await productsManager.fetchProducts(); // Then fetch all products
 
@@ -59,7 +59,7 @@ class _ProductScreenState extends State<ProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productsManager = Provider.of<ProductsManager>(context, listen: true);
+    final productsManager = Provider.of<AdminProductsManager>(context, listen: true);
 
     // Lọc sản phẩm dựa trên category và search query
     var filteredProducts = productsManager.items;
@@ -77,7 +77,7 @@ class _ProductScreenState extends State<ProductsScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AppDrawer(),
+      drawer: AdminAppDrawer(),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SafeArea(
@@ -252,7 +252,7 @@ class _ProductScreenState extends State<ProductsScreen> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 10,
                                     mainAxisSpacing: 10,
-                                    childAspectRatio: 0.597,
+                                    childAspectRatio: 0.59,
                                   ),
                                   itemCount: filteredProducts.length,
                                   itemBuilder: (context, index) {
@@ -380,7 +380,7 @@ class ProductItem extends StatelessWidget {
                             );
 
                             if (confirm == true) {
-                              Provider.of<ProductsManager>(context,
+                              Provider.of<AdminProductsManager>(context,
                                       listen: false)
                                   .deleteProduct(product.pid!);
                             }

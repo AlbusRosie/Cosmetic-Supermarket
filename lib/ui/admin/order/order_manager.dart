@@ -1,24 +1,24 @@
 import '../../../models/order_item.dart';
-import '../../../services/order_service.dart';
+import '../../../services/orders_service.dart';
 import 'package:flutter/foundation.dart';
 
-class OrdersManager with ChangeNotifier {
-  final OrderService _ordersService = OrderService();
+class AdminOrdersManager with ChangeNotifier {
+  final OrdersService _ordersService = OrdersService();
   final List<OrderItem> _orders = [];
 
   int get orderCount => _orders.length;
   List<OrderItem> get orders => [..._orders];
 
-  Future<void> fetchAllOrders() async {
+  Future<void> adminFetchAllOrders() async {
     print("✅ Fetching orders...");
-    final fetchedOrders = await _ordersService.fetchAllOrders();
+    final fetchedOrders = await _ordersService.adminFetchAllOrders();
     if (fetchedOrders.isEmpty) print("❌ No orders found or failed to fetch.");
     _orders.clear();
     _orders.addAll(fetchedOrders);
     notifyListeners();
   }
 
-  Future<void> updateOrderStatus(String orderId, String newStatus) async {
+  Future<void> adminUpdateOrderStatus(String orderId, String newStatus) async {
     final index = _orders.indexWhere((o) => o.id == orderId);
     if (index != -1) {
       final updatedOrder = _orders[index].copyWith(status: newStatus);

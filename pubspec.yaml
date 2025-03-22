@@ -18,7 +18,7 @@ dependencies:
   shared_preferences: ^2.5.2
   pocketbase: ^0.22.0
   image_picker: ^1.1.2
-  path: ^1.9.1
+  path: ^1.9.0
   path_provider: ^2.1.2
   flutter_dotenv: ^5.2.1
   uuid: ^4.5.1
@@ -33,6 +33,8 @@ flutter:
   assets:
     - assets/images/lanara.png
     - .env
+    - assets/
+    - assets/images/
   fonts:
   - family: Lato
     fonts:
@@ -48,5 +50,4 @@ flutter:
   - family: Genty
     fonts:
       - asset: assets/fonts/GentyDemo-Regular.ttf
-    - assets/
-    - assets/images/
+

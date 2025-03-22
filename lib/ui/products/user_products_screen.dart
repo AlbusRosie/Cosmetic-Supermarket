@@ -238,15 +238,14 @@ class _UserProductsScreenState extends State<UserProductsScreen>
 
   final List<Map<String, dynamic>> categories = [
     {"name": "All", "icon": Icons.category},
-    {"name": "Lipsticks", "icon": Icons.face},
-    {"name": "Lip Glosses", "icon": Icons.face_retouching_natural},
-    {"name": "Blushes", "icon": Icons.brush},
-    {"name": "Foundations", "icon": Icons.format_paint},
-    {"name": "Concealers", "icon": Icons.blur_on},
-    {"name": "Powders", "icon": Icons.cloud},
-    {"name": "Eyeshadows", "icon": Icons.visibility},
-    {"name": "Eyeliners", "icon": Icons.edit},
-    {"name": "Mascaras", "icon": Icons.remove_red_eye},
+    {"name": "Lipstick", "icon": Icons.face},
+    {"name": "Foundation", "icon": Icons.face_retouching_natural},
+    {"name": "Mascara", "icon": Icons.remove_red_eye},
+    {"name": "Blush", "icon": Icons.format_paint},
+    {"name": "Concealer", "icon": Icons.blur_on},
+    {"name": "Highlighter", "icon": Icons.cloud},
+    {"name": "Eye Shadow", "icon": Icons.visibility},
+    {"name": "Setting Powder", "icon": Icons.edit},
   ];
 }
 

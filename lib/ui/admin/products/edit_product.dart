@@ -52,7 +52,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void _loadProduct() {
     final productId = ModalRoute.of(context)!.settings.arguments as String?;
     if (productId != null) {
-      final product = Provider.of<ProductsManager>(context, listen: false)
+      final product = Provider.of<AdminProductsManager>(context, listen: false)
           .findById(productId);
       if (product != null) {
         setState(() {
@@ -90,7 +90,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
 
     try {
-      await Provider.of<ProductsManager>(context, listen: false)
+      await Provider.of<AdminProductsManager>(context, listen: false)
           .updateProduct(updatedProduct);
       Navigator.of(context).pop();
     } catch (error) {

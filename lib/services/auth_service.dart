@@ -1,6 +1,6 @@
 import 'package:pocketbase/pocketbase.dart';
-import '../models/user.dart';
 import 'pocketbase_client.dart';
+import '../models/user.dart';
 
 class AuthService {
   void Function(User? user)? onAuthChange;
@@ -41,8 +41,7 @@ class AuthService {
             filter: 'email = "$email"',
           );
       if (existingEmailUsers.items.isNotEmpty) {
-        throw (
-            "This email is already registered. Please use a different one.");
+        throw ("This email is already registered. Please use a different one.");
       }
 
       // Check if the phone number already exists
@@ -50,8 +49,7 @@ class AuthService {
             filter: 'phone = "$phone"',
           );
       if (existingPhoneUsers.items.isNotEmpty) {
-        throw (
-            "This phone number is already in use. Please use a different one.");
+        throw ("This phone number is already in use. Please use a different one.");
       }
       print('Creating user: $email');
 
@@ -62,7 +60,7 @@ class AuthService {
         'password': password,
         'passwordConfirm': password,
         'urole': 'customer',
-        'emailVisibility': true, 
+        'emailVisibility': true,
       });
 
       print('PocketBase response: ${record.toJson()}');
@@ -87,6 +85,7 @@ class AuthService {
     if (pb == null) {
       throw Exception("PocketBase not initialized. Please restart the app.");
     }
+
     try {
       final authRecord =
           await pb.collection('users').authWithPassword(email, password);

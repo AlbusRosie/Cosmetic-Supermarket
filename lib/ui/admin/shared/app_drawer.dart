@@ -7,9 +7,9 @@ import '../products/add_product.dart';
 import '../products/products_screen.dart';
 import '../user/user_screen.dart';
 
-class AppDrawer extends StatelessWidget {
-  static const routeName = '/AppDrawer';
-  const AppDrawer({super.key});
+class AdminAppDrawer extends StatelessWidget {
+  static const routeName = '/AdminAppDrawer';
+  const AdminAppDrawer({super.key});
 
   Widget _buildListTile(
     BuildContext context, {
@@ -131,7 +131,7 @@ class AppDrawer extends StatelessWidget {
                     context,
                     icon: Icons.dashboard,
                     title: 'Dashboard',
-                    routeName: ProductsScreen.routeName,
+                    routeName: AdminProductsScreen.routeName,
                     iconColor: Colors.white,
                     textColor: Colors.white,
                     backgroundColor: color4.withOpacity(0.2),
@@ -149,7 +149,7 @@ class AppDrawer extends StatelessWidget {
                     context,
                     icon: Icons.payment,
                     title: 'Manage Orders',
-                    routeName: OrdersScreen.routeName,
+                    routeName: AdminOrdersScreen.routeName,
                     iconColor: Colors.white,
                     textColor: Colors.white,
                     backgroundColor: color4.withOpacity(0.2),
@@ -158,7 +158,7 @@ class AppDrawer extends StatelessWidget {
                     context,
                     icon: Icons.people,
                     title: 'Manage Users',
-                    routeName: UsersScreen.routeName,
+                    routeName: AdminUsersScreen.routeName,
                     iconColor: Colors.white,
                     textColor: Colors.white,
                     backgroundColor: color4.withOpacity(0.2),

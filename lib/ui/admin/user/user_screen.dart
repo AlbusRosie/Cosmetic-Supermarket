@@ -5,15 +5,15 @@ import 'user_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
 
-class UsersScreen extends StatefulWidget {
+class AdminUsersScreen extends StatefulWidget {
   static const routeName = '/users';
-  const UsersScreen({super.key});
+  const AdminUsersScreen({super.key});
 
   @override
-  State<UsersScreen> createState() => _UsersScreenState();
+  State<AdminUsersScreen> createState() => _AdminUsersScreenState();
 }
 
-class _UsersScreenState extends State<UsersScreen> {
+class _AdminUsersScreenState extends State<AdminUsersScreen> {
   late Future<void> _fetchUsers;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
@@ -33,7 +33,7 @@ class _UsersScreenState extends State<UsersScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _fetchUsers = Provider.of<UserManager>(context, listen: false).fetchUsers();
+    _fetchUsers = Provider.of<AdminUserManager>(context, listen: false).adminFetchUsers();
   }
 
   @override
@@ -46,7 +46,7 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: const AdminAppDrawer(),
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
@@ -98,7 +98,7 @@ class _UsersScreenState extends State<UsersScreen> {
                       return Center(
                           child: CircularProgressIndicator(color: color11));
                     }
-                    return Consumer<UserManager>(
+                    return Consumer<AdminUserManager>(
                       builder: (ctx, userManager, child) {
                         var customers = userManager.customers;
                         if (_searchQuery.isNotEmpty) {

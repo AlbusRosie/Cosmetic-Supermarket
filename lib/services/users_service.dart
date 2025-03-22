@@ -16,7 +16,7 @@ class UsersService {
   Future<User?> fetchUser() async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       if (userId == null) {
         print('No authenticated user found');
         return null;
@@ -26,7 +26,7 @@ class UsersService {
       return User.fromJson({
         ...userJson,
         'avatar': _getAvatarUrl(pb, userModel),
-        'email': userModel.getStringValue('email') ?? '',
+        'email': userModel.getStringValue('email'),
       });
     } catch (error) {
       print('Error fetching user: $error');
@@ -37,13 +37,12 @@ class UsersService {
   Future<User?> updateUser(User user, {File? avatarFile}) async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       if (userId == null) {
         print('No authenticated user found');
         return null;
       }
       final updateData = {
-        'name': user.name,
         'username': user.username,
         'updated': DateTime.now().toIso8601String(),
       };
@@ -67,7 +66,7 @@ class UsersService {
       return User.fromJson({
         ...updatedUserModel.toJson(),
         'avatar': _getAvatarUrl(pb, updatedUserModel),
-        'email': updatedUserModel.getStringValue('email') ?? '',
+        'email': updatedUserModel.getStringValue('email'),
       });
     } catch (error) {
       print('Error updating user: $error');
@@ -75,10 +74,10 @@ class UsersService {
     }
   }
 
-  Future<User?> addUser(User user, {File? avatarFile}) async {
+    Future<User?> addUser(User user, {File? avatarFile}) async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       if (userId == null) {
         print('No authenticated user found');
         return null;
@@ -86,7 +85,6 @@ class UsersService {
 
       final userData = {
         'email': user.email,
-        'name': user.name,
         'username': user.username,
         'created': DateTime.now().toIso8601String(),
         'updated': DateTime.now().toIso8601String(),
@@ -102,7 +100,7 @@ class UsersService {
             ]
           : [];
 
-      final userModel = await pb.collection('users').create(
+      final userModel = await pb!.collection('users').create(
             body: userData,
             files: files,
           );
@@ -120,7 +118,7 @@ class UsersService {
   Future<bool> deleteUser() async {
     try {
       final pb = await getPocketbaseInstance();
-      final userId = pb.authStore.record?.id;
+      final userId = pb!.authStore.record?.id;
       if (userId == null) {
         return false;
       }
@@ -128,6 +126,39 @@ class UsersService {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+// ***************************************************Admin******************************************
+String _getFeaturedImageUrl(PocketBase pb, RecordModel userModel) {
+    final avatar = userModel.getStringValue('avatar');
+    return pb.files.getUrl(userModel, avatar).toString();
+  }
+
+  Future<List<User>> adminFetchUsers({bool filteredByUser = false}) async {
+    final List<User> users = [];
+    try {
+      final pb = await getPocketbaseInstance();
+      final userId = pb!.authStore.record?.id;
+      final filter = filteredByUser
+          ? "id='$userId' && urole='customer'"
+          : "urole='customer'";
+      final userModels = await pb.collection('users').getFullList(
+            filter: filter,
+          );
+
+      for (final userModel in userModels) {
+        final userJson = userModel.toJson();
+        users.add(User.fromJson({
+          ...userJson,
+          'avatar': _getFeaturedImageUrl(pb, userModel),
+        }));
+      }
+      print('Fetched ${users.length} customers');
+      return users;
+    } catch (error) {
+      print('🔴🔴🔴 Error fetching users: $error');
+      return users;
     }
   }
 }

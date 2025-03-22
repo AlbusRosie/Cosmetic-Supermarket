@@ -4,7 +4,7 @@ import '../cart/cart_screen.dart';
 import '../user/edit_user_screen.dart';
 import 'package:provider/provider.dart';
 import '../user/users_manager.dart';
-import '../auth/auth_manager.dart';
+import 'package:ct312h_project/ui/admin/auth/auth_manager.dart';
 
 const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
 const Color laranaPinkLight = Color(0xFFFFF0F0);
@@ -145,8 +145,8 @@ class _AppDrawerState extends State<AppDrawer>
                           ),
                         )
                       : Text(
-                          user?.name != null && user!.name!.isNotEmpty
-                              ? 'Hello, ${user.name}!'
+                          user?.username != null && user!.username!.isNotEmpty
+                              ? 'Hello, ${user.username}!'
                               : 'Hello, Friend!',
                           style: const TextStyle(
                             fontSize: 26,

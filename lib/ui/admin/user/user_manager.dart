@@ -1,15 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '../../../models/user.dart';
-import '../../../services/user_service.dart';
-
-class UserManager with ChangeNotifier {
-  final UserService _userService = UserService();
+import '../../../services/users_service.dart';
+class AdminUserManager with ChangeNotifier {
+  final UsersService _userService = UsersService();
   List<User> _users = [];
 
   List<User> get customers => [..._users];
 
-  Future<void> fetchUsers({String? category}) async {
-    _users = await _userService.fetchUsers();
+  Future<void> adminFetchUsers({String? category}) async {
+    _users = await _userService.adminFetchUsers();
     notifyListeners();
   }
 }

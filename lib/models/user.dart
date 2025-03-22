@@ -1,8 +1,7 @@
 class User {
   final String id;
-  final String username;
   final String email;
-  final String? name;
+  final String username;
   final String? urole;
   final String phone;
   final String? address;
@@ -10,7 +9,6 @@ class User {
 
   User({
     required this.id,
-    this.name,
     required this.email,
     required this.username,
     this.urole,
@@ -21,7 +19,6 @@ class User {
 
   User copyWith({
     String? id,
-    String? name,
     String? email,
     String? username,
     String? urole,
@@ -31,8 +28,6 @@ class User {
   }) {
     return User(
       id: id ?? this.id,
-      name: name ?? this.name,
-      avatar: avatar ?? this.avatar,
       email: email ?? this.email,
       username: username ?? this.username,
       urole: urole ?? this.urole,
@@ -65,16 +60,14 @@ class User {
       phone: json['phone']?.toString() ?? '',
       address: json['address']?.toString() ?? '',
       avatar: json['avatar']?.toString() ?? '',
-      name: json['name'] as String? ?? '',
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'email': email,
-      'name': name,
       'username': username,
-      'avatar': avatar,
       'urole': urole,
       'phone': phone,
       'address': address,

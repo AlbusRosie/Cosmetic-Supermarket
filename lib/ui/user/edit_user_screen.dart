@@ -5,8 +5,8 @@ import '../../models/user.dart';
 import '../../ui/shared/dialog_utils.dart';
 import 'users_manager.dart';
 import '../shared/app_drawer.dart';
-import '../auth/auth_manager.dart';
-import '../auth/auth_screen.dart'; // Thêm import này
+import 'package:ct312h_project/ui/admin/auth/auth_manager.dart';
+import 'package:ct312h_project/ui/admin/auth/auth_screen.dart';
 import 'dart:io';
 
 class EditUserScreen extends StatefulWidget {
@@ -39,8 +39,8 @@ class _EditUserScreenState extends State<EditUserScreen> {
             id: '',
             username: '',
             email: '',
-            name: '',
             avatar: '',
+            phone: '',
           )
         : widget.user!;
     _loadUserData();
@@ -155,8 +155,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: <Widget>[
-                      _buildNameField(),
-                      const SizedBox(height: 20),
                       _buildUsernameField(),
                       const SizedBox(height: 20),
                       _buildEmailField(),
@@ -258,37 +256,6 @@ class _EditUserScreenState extends State<EditUserScreen> {
     );
   }
 
-  Widget _buildNameField() {
-    const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
-    return TextFormField(
-      initialValue: _editedUser.name,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: laranaPink),
-        hintText: 'Name',
-        hintStyle: const TextStyle(color: Colors.grey),
-        filled: true,
-        fillColor: const Color.fromARGB(255, 255, 240, 240),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-      ),
-      textInputAction: TextInputAction.next,
-      autofocus: true,
-      style: const TextStyle(fontSize: 16, color: Colors.black87),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please provide a name.';
-        }
-        return null;
-      },
-      onSaved: (value) {
-        _editedUser = _editedUser.copyWith(name: value);
-      },
-    );
-  }
 
   Widget _buildUsernameField() {
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
