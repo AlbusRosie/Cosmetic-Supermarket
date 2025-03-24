@@ -12,65 +12,130 @@ class OrderItemCard extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'completed':
-        return const Color.fromARGB(255, 94, 181, 97);
+        return const Color.fromARGB(255, 94, 181, 97); 
       case 'canceled':
-        return const Color.fromARGB(255, 253, 72, 72);
+        return const Color.fromARGB(255, 253, 72, 72); 
       case 'confirmed':
-        return Colors.blue;
+        return Colors.blue; 
       case 'pending':
         return Colors.orange;
       default:
-        return Colors.grey;
+        return Colors.grey; 
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: color2,
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(vertical: 4.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 3, 
+      margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(12), 
+      ),
+      color: color2, 
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(
+              16.0), 
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(order.user?.username ?? 'Unknown User',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500)),
-                  const SizedBox(height: 4),
-                  Text(DateFormat('dd/MM/yyyy').format(order.dateTime),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                ],
-              ),
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                        color: _getStatusColor(order.status).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Text(order.status.toUpperCase(),
-                        style: TextStyle(
-                            color: _getStatusColor(order.status),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(width: 8),
-                  Text("\$${order.amount.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: color4)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: _getStatusColor(order.status),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: _getStatusColor(order.status)
+                                    .withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                order.status.toUpperCase(),
+                                style: TextStyle(
+                                  color: _getStatusColor(order.status),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 14,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              DateFormat('dd/MM/yyyy').format(order.dateTime),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "\$${order.amount.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontSize: 18, 
+                                fontWeight: FontWeight.bold,
+                                color: color11,  
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.person_outline,
+                          size: 20,
+                          color: color4.withOpacity(0.7),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          order.user?.username ?? 'Unknown User',
+                          style: TextStyle(
+                            fontSize: 18, 
+                            fontWeight: FontWeight.w600,
+                            color: color4,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),                
+                  ],
+                ),
               ),
             ],
           ),

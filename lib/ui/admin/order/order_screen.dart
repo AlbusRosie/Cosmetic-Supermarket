@@ -236,9 +236,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   }
 
 void _showOrderDetailsPopup(
-  BuildContext context, OrderItem order, AdminOrdersManager ordersManager) {
+      BuildContext context, OrderItem order, AdminOrdersManager ordersManager) {
     final totalQuantity =
         order.products.fold<int>(0, (sum, product) => sum + (product.quantity));
+
+    // Create a ScrollController for the products list
+    final ScrollController _productsScrollController = ScrollController();
 
     // Function to truncate product title if it's too long
     String truncateProductTitle(String title, {int maxLength = 20}) {
@@ -271,16 +274,33 @@ void _showOrderDetailsPopup(
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      "Name: ${order.user?.username}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: color4,
+                    Row(
+                    children: [
+                      Icon(Icons.person, size: 20, color: color4),
+                      const SizedBox(width: 8),
+                      Text(
+                        order.user?.username ?? 'Unknown User',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: color4,
+                        ),
                       ),
+                    ],
                     ),
-                    Text(
-                      "Phone: ${order.user?.phone}",
-                      style: TextStyle(color: color4),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(Icons.phone, size: 20, color: color4),
+                        const SizedBox(width: 8),
+                        Text(
+                          order.user?.phone ?? 'N/A',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: color4,
+                          ),
+                        ),
+                      ],
                     ),
                     const Divider(),
                     Text(
@@ -292,6 +312,11 @@ void _showOrderDetailsPopup(
                     ),
                     // Add a constrained height and scrollbar for the product list
                     Container(
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 249, 223, 221),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      
                       constraints: BoxConstraints(
                         maxHeight: order.products.length > 3
                             ? 120 // Set a max height for more than 3 products
@@ -299,9 +324,12 @@ void _showOrderDetailsPopup(
                                 .infinity, // No height constraint if 3 or fewer products
                       ),
                       child: Scrollbar(
-                        thumbVisibility: order.products.length >
-                            3, // Show scrollbar only if more than 3 products
+                        controller:
+                            _productsScrollController, // Add ScrollController
+                        thumbVisibility: order.products.length > 3,
                         child: SingleChildScrollView(
+                          controller:
+                              _productsScrollController, // Same controller for SingleChildScrollView
                           child: Column(
                             children: order.products.map((prod) {
                               return Padding(
@@ -334,6 +362,8 @@ void _showOrderDetailsPopup(
                         ),
                       ),
                     ),
+                    
+                    
                     const Divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -394,7 +424,7 @@ void _showOrderDetailsPopup(
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromARGB(255, 97,
-                                      202, 100), // Green for "Completed"
+                                      202, 100),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
@@ -408,7 +438,7 @@ void _showOrderDetailsPopup(
                                 ),
                               ),
                               const SizedBox(
-                                  width: 8), // Spacing between buttons
+                                  width: 8), 
                               ElevatedButton(
                                 onPressed: () async {
                                   if (order.status != 'canceled') {
@@ -428,7 +458,7 @@ void _showOrderDetailsPopup(
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color.fromARGB(
-                                      255, 218, 104, 96), // Red for "Canceled"
+                                      255, 218, 104, 96),  
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 8),
@@ -476,6 +506,10 @@ void _showOrderDetailsPopup(
           ],
         ),
       ),
-    );
+    ).then((_) {
+      // Dispose the controller when the dialog is closed
+      _productsScrollController.dispose();
+    });
   }
+
 }
