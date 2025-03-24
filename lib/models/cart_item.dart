@@ -7,14 +7,14 @@ class CartItem {
   final String imageUrl;
   final String status;
 
-  CartItem({
-    this.id,
-    required this.productId,
-    required this.title,
-    required this.price,
-    required this.quantity,
-    this.imageUrl = '',
-    this.status = 'pending'});
+  CartItem(
+      {this.id,
+      required this.productId,
+      required this.title,
+      required this.price,
+      required this.quantity,
+      this.imageUrl = '',
+      this.status = 'pending'});
 
   CartItem copyWith({
     String? id,
@@ -49,13 +49,13 @@ class CartItem {
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
-      id: json['id'],
-      productId: json['productId'],
-      title: json['title'],
-      price: json['price'],
-      quantity: json['quantity'],
-      imageUrl: json['imageUrl'] ?? '',
-      status: json['status'] ?? 'pending',
+      id: json['id']?.toString(),
+      productId: json['productId']?.toString() ?? '',
+      title: json['title']?.toString() ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0, 
+      quantity: (json['quantity'] as num?)?.toInt() ?? 1, 
+      imageUrl: json['imageUrl']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'pending',
     );
   }
 }

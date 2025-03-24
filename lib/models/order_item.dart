@@ -1,5 +1,5 @@
 import 'cart_item.dart';
-import 'user.dart'; 
+import 'user.dart';
 
 class OrderItem {
   final String? id;
@@ -29,7 +29,7 @@ class OrderItem {
     DateTime? dateTime,
     String? status,
     String? userId,
-    User? user,
+    User? user, 
   }) {
     return OrderItem(
       id: id ?? this.id,
@@ -66,7 +66,7 @@ class OrderItem {
       userId: json['userId'],
       user: json['user'] != null
           ? User.fromJson(json['user'])
-          : null,
+          : null, 
     );
   }
 }

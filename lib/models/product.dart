@@ -61,7 +61,7 @@ class Product {
       'description': description,
       'price': price,
       'isFavorite': isFavorite,
-      'stockQuantity':stockQuantity,
+      'stockQuantity': stockQuantity,
       'category': category,
       'locked': locked,
     };
@@ -69,10 +69,12 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      pid: json['id'] ,
+      pid: json['id'],
       title: json['title'] ?? '',
       description: json['description'] ?? '',
-      price: (json['price'] is int)? (json['price'] as int).toDouble() : (json['price'] ?? 0.0),
+      price: (json['price'] is int)
+          ? (json['price'] as int).toDouble()
+          : (json['price'] ?? 0.0),
       isFavorite: json['isFavorite'] ?? false,
       imageUrl: json['imageUrl'] ?? '',
       stockQuantity: json['stockQuantity'] ?? 0,
