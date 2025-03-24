@@ -286,7 +286,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                   Text(
                                     '4.5 (100 reviews)',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 12,
                                       color: Colors.grey[700],
                                     ),
                                   ),

@@ -191,7 +191,7 @@ class _UserProductsScreenState extends State<UserProductsScreen>
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: SizedBox(
-                    height: 50, // Giữ nguyên 50
+                    height: 50, 
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: categories.length,
@@ -295,7 +295,7 @@ class UserProductList extends StatelessWidget {
             crossAxisCount: 2,
             crossAxisSpacing: 5,
             mainAxisSpacing: 10,
-            childAspectRatio: 0.75,
+            childAspectRatio: 0.68,
           ),
           itemCount: productsToShow.length,
           itemBuilder: (ctx, i) => UserProduct(

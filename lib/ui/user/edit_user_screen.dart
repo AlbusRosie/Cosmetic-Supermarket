@@ -32,7 +32,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  bool _isLoading =true; 
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -66,7 +66,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
           _emailController.text = _editedUser.email;
           _phoneController.text = _editedUser.phone;
           _addressController.text = _editedUser.address ?? '';
-          _isLoading = false; 
+          _isLoading = false;
         });
       } else {
         if (mounted) {

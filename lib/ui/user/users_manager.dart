@@ -14,7 +14,7 @@ class UsersManager with ChangeNotifier {
       final userData = await _usersService.fetchUser();
       if (userData != null) {
         _currentUser = userData;
-        print('🌷🌷🌷 Fetched user with email: ${_currentUser?.email}');
+        print('Fetched user with email: ${_currentUser?.email}');
         notifyListeners();
       } else {
         throw Exception('User data not found');
