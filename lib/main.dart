@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'ui/splash_screen.dart';
-
-//*************Customer************** */
 import 'ui/products/products_manager.dart';
 import 'ui/user/edit_user_screen.dart';
 import 'ui/admin/products/edit_product.dart';
@@ -14,8 +12,6 @@ import 'ui/orders/orders_manager.dart';
 import 'ui/user/users_manager.dart';
 import 'ui/cart/cart_screen.dart';
 import 'ui/orders/orders_screen.dart';
-
-//*************Admin************** */
 import 'ui/admin/auth/auth_manager.dart';
 import 'ui/admin/products/products_screen.dart';
 import 'ui/admin/order/order_screen.dart';
@@ -38,29 +34,14 @@ Future<void> main() async {
   runApp(const Larana());
 }
 
-class Larana extends StatelessWidget {
+class Larana extends StatefulWidget {
   const Larana({super.key});
 
-  Route _onGenerateRoute(RouteSettings settings) {
-    switch (settings.name) {
-      case EditUserScreen.routeName:
-        final user = settings.arguments as User?;
-        return MaterialPageRoute(
-          builder: (ctx) => SafeArea(child: EditUserScreen(user)),
-        );
-      case EditProductScreen.routeName:
-        return MaterialPageRoute(
-          builder: (ctx) => const EditProductScreen(),
-        );
-      default:
-        return MaterialPageRoute(
-          builder: (ctx) => const SafeArea(
-            child: Scaffold(body: Center(child: Text('Page not found'))),
-          ),
-        );
-    }
-  }
+  @override
+  State<Larana> createState() => _LaranaState();
+}
 
+class _LaranaState extends State<Larana> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = ColorScheme.fromSeed(
@@ -97,55 +78,83 @@ class Larana extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        //*********Customer********** */
         ChangeNotifierProvider(create: (ctx) => ProductsManager()),
         ChangeNotifierProvider(create: (ctx) => CartManager()),
         ChangeNotifierProvider(create: (ctx) => OrdersManager()),
         ChangeNotifierProvider(create: (ctx) => UsersManager()),
-
-        //*********Admin********** */
         ChangeNotifierProvider(create: (ctx) => AuthManager()),
         ChangeNotifierProvider(create: (ctx) => AdminProductsManager()),
         ChangeNotifierProvider(create: (ctx) => AdminOrdersManager()),
         ChangeNotifierProvider(create: (ctx) => AdminUserManager()),
       ],
-      child: Consumer<AuthManager>(
-        builder: (ctx, authManager, child) {
-          print(
-              '🔴 Building app: isInitialized=${authManager.isInitialized}, isAuth=${authManager.isAuth}');
+      child: Builder(
+        builder: (context) {
+          final authManager = Provider.of<AuthManager>(context, listen: false);
+          // Call initialize only once
+          if (!authManager.isInitialized) {
+            authManager.initialize();
+          }
 
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Cosmetic Supermarket App',
-            theme: themeData,
-            home: authManager.isInitialized
-                ? (authManager.isAuth
-                    ? (authManager.isStaff
-                        ? const AdminProductsScreen()
-                        : const UserProductsScreen())
-                    : const AuthScreen())
-                : const SplashScreen(),
-            routes: {
-              //**********Customer*************/
-              CartScreen.routeName: (ctx) =>
-                  const SafeArea(child: CartScreen()),
-              OrdersScreen.routeName: (ctx) =>
-                  const SafeArea(child: OrdersScreen()),
+          return Consumer<AuthManager>(
+            builder: (ctx, authManager, child) {
+              print(
+                  '🔴 Building app: isInitialized=${authManager.isInitialized}, isAuth=${authManager.isAuth}, isSplashComplete=${authManager.isSplashComplete}');
 
-              //**********Admin*************/
-              AuthScreen.routeName: (ctx) =>
-                  const SafeArea(child: AuthScreen()),
-              AdminProductsScreen.routeName: (ctx) =>
-                  const AdminProductsScreen(),
-              AddProductScreen.routeName: (ctx) => const AddProductScreen(),
-              AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
-              EditProductScreen.routeName: (ctx) => EditProductScreen(),
-              AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
-            },
-            onGenerateRoute: _onGenerateRoute,
-            onUnknownRoute: (settings) {
-              return MaterialPageRoute(
-                builder: (ctx) => const UserProductsScreen(),
+              Widget homeScreen;
+              if (!authManager.isSplashComplete) {
+                homeScreen = const SplashScreen();
+              } else if (!authManager.isAuth) {
+                homeScreen = const AuthScreen();
+              } else {
+                homeScreen = authManager.isStaff
+                    ? const AdminProductsScreen()
+                    : const UserProductsScreen();
+              }
+
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'Cosmetic Supermarket App',
+                theme: themeData,
+                home: homeScreen,
+                routes: {
+                  CartScreen.routeName: (ctx) =>
+                      const SafeArea(child: CartScreen()),
+                  OrdersScreen.routeName: (ctx) =>
+                      const SafeArea(child: OrdersScreen()),
+                  AuthScreen.routeName: (ctx) =>
+                      const SafeArea(child: AuthScreen()),
+                  AdminProductsScreen.routeName: (ctx) =>
+                      const AdminProductsScreen(),
+                  AddProductScreen.routeName: (ctx) => const AddProductScreen(),
+                  AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
+                  EditProductScreen.routeName: (ctx) => EditProductScreen(),
+                  AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
+                },
+                onGenerateRoute: (settings) {
+                  switch (settings.name) {
+                    case EditUserScreen.routeName:
+                      final user = settings.arguments as User?;
+                      return MaterialPageRoute(
+                        builder: (ctx) => SafeArea(child: EditUserScreen(user)),
+                      );
+                    case EditProductScreen.routeName:
+                      return MaterialPageRoute(
+                        builder: (ctx) => const EditProductScreen(),
+                      );
+                    default:
+                      return MaterialPageRoute(
+                        builder: (ctx) => const SafeArea(
+                          child: Scaffold(
+                              body: Center(child: Text('Page not found'))),
+                        ),
+                      );
+                  }
+                },
+                onUnknownRoute: (settings) {
+                  return MaterialPageRoute(
+                    builder: (ctx) => const UserProductsScreen(),
+                  );
+                },
               );
             },
           );
