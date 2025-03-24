@@ -30,6 +30,7 @@ class OrdersService {
       return false;
     }
   }
+
   Future<List<OrderItem>> fetchOrders({bool filteredByUser = false}) async {
     final List<OrderItem> orders = [];
 
@@ -76,6 +77,7 @@ class OrdersService {
       return orders;
     }
   }
+
   Future<OrderItem?> addOrder(OrderItem order) async {
     try {
       final pb = await getPocketbaseInstance();
@@ -87,7 +89,8 @@ class OrdersService {
 
       for (var cartItem in order.products) {
         try {
-          final productRecord = await pb.collection('products').getOne(cartItem.productId);
+          final productRecord =
+              await pb.collection('products').getOne(cartItem.productId);
           final currentStock = productRecord.data['stockQuantity'] ?? 0;
           final isLocked = productRecord.data['locked'] ?? false;
           if (isLocked) {
@@ -123,7 +126,8 @@ class OrdersService {
             print('Error unlocking product $productId: $e');
           }
         }
-        throw Exception('Cannot create order: No valid products found. Please check if the products still exist.');
+        throw Exception(
+            'Cannot create order: No valid products found. Please check if the products still exist.');
       }
       final orderData = {
         'amount': order.amount,
@@ -150,9 +154,14 @@ class OrdersService {
         }
         for (var cartItem in validCartItems) {
           final cartRecords = await pb.collection('carts').getFullList(
-                filter:"userId='$userId' && productId='${cartItem.productId}' && status='pending'",);
+                filter:
+                    "userId='$userId' && productId='${cartItem.productId}' && status='pending'",
+              );
           for (final cart in cartRecords) {
-            await pb.collection('carts').update(cart.id,body: {'status': 'checked_out'},);
+            await pb.collection('carts').update(
+              cart.id,
+              body: {'status': 'checked_out'},
+            );
           }
         }
       } catch (error) {
@@ -178,6 +187,7 @@ class OrdersService {
       throw Exception('Failed to add order: $error');
     }
   }
+
   Future<void> cleanInvalidCartItems() async {
     try {
       final pb = await getPocketbaseInstance();
@@ -197,6 +207,7 @@ class OrdersService {
       print('Error cleaning invalid cart items: $error');
     }
   }
+
 // ********************************************************Admin************************************************//
   Future<List<OrderItem>> adminFetchAllOrders() async {
     final List<OrderItem> orders = [];

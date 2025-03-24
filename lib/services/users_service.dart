@@ -23,7 +23,7 @@ class UsersService {
       }
       final userModel = await pb.collection('users').getOne(userId);
       final userJson = userModel.toJson();
-      print('❤️❤️❤️ Fetched user data from PocketBase: $userJson'); 
+      print('❤️❤️❤️ Fetched user data from PocketBase: $userJson');
       return User.fromJson({
         ...userJson,
         'avatar': _getAvatarUrl(pb, userModel),
@@ -77,7 +77,7 @@ class UsersService {
     }
   }
 
-    Future<User?> addUser(User user, {File? avatarFile}) async {
+  Future<User?> addUser(User user, {File? avatarFile}) async {
     try {
       final pb = await getPocketbaseInstance();
       final userId = pb!.authStore.record?.id;
@@ -133,7 +133,7 @@ class UsersService {
   }
 
 // ***************************************************Admin******************************************
-String _getFeaturedImageUrl(PocketBase pb, RecordModel userModel) {
+  String _getFeaturedImageUrl(PocketBase pb, RecordModel userModel) {
     final avatar = userModel.getStringValue('avatar');
     return pb.files.getUrl(userModel, avatar).toString();
   }
