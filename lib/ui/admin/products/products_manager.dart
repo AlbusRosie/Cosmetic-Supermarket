@@ -7,6 +7,15 @@ class AdminProductsManager with ChangeNotifier {
   List<Product> _items = [];
   List<String> _categories = [];
 
+  Future<void> adminFetchAllProducts() async {
+    print("✅ Fetching orders...");
+    final fetchedProducts = await _productsService.fetchProducts();
+    if (fetchedProducts.isEmpty) print("❌ No orders found or failed to fetch.");
+    _items.clear();
+    _items.addAll(fetchedProducts);
+    notifyListeners();
+  }
+
   Future<void> fetchProducts({String? category}) async {
     _items = await _productsService.fetchProducts(category: category);
     notifyListeners();
@@ -45,7 +54,7 @@ class AdminProductsManager with ChangeNotifier {
     }
   }
 
-  Future<void> updateProduct(Product product) async {
+Future<void> updateProduct(Product product) async {
     final index = _items.indexWhere((item) => item.pid == product.pid);
     if (index >= 0) {
       final updatedProduct = await _productsService.updateProduct(product);

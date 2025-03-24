@@ -28,7 +28,6 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
   void initState() {
     super.initState();
     _loadData();
-    // Thêm listener cho search input
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text;
@@ -59,223 +58,238 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  final productsManager = Provider.of<AdminProductsManager>(context, listen: true);
+  Widget build(BuildContext context) {
+    final productsManager =
+        Provider.of<AdminProductsManager>(context, listen: true);
 
-  // Filter products based on category and search query
-  var filteredProducts = productsManager.items;
-  if (_selectedCategory != null) {
-    filteredProducts = filteredProducts
-        .where((product) => product.category == _selectedCategory)
-        .toList();
-  }
-  if (_searchQuery.isNotEmpty) {
-    filteredProducts = filteredProducts
-        .where((product) =>
-            product.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-  }
+    // Filter products based on category and search query
+    var filteredProducts = productsManager.items;
+    if (_selectedCategory != null) {
+      filteredProducts = filteredProducts
+          .where((product) => product.category == _selectedCategory)
+          .toList();
+    }
+    if (_searchQuery.isNotEmpty) {
+      filteredProducts = filteredProducts
+          .where((product) =>
+              product.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+          .toList();
+    }
 
-  return Scaffold(
-    key: _scaffoldKey,
-    drawer: AppDrawer(),
-    body: _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : SafeArea(
-            child: Container(
-              margin: EdgeInsets.only(left: 10, top: 10),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.menu, color: color4, size: 30),
-                        onPressed: () {
-                          _scaffoldKey.currentState?.openDrawer();
-                        },
-                      ),
-                      SizedBox(width: 10),
-                      Container(
-                        width: 250, 
-                        padding: EdgeInsets.only(left: 15.0, right: 10.0),
-                        decoration: BoxDecoration(
-                          color: color17,
-                          borderRadius: BorderRadius.circular(10),
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: AppDrawer(),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: Container(
+                margin: EdgeInsets.only(left: 10, top: 10),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.menu, color: color4, size: 30),
+                          onPressed: () {
+                            _scaffoldKey.currentState?.openDrawer();
+                          },
                         ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Search by product name...",
-                                  hintStyle: TextStyle(color: color4),
-                                ),
-                                style: TextStyle(color: color4),
-                              ),
-                            ),
-                            Icon(Icons.search, color: color4, size: 25.0),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 10), 
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            AddProductScreen.routeName,
-                            arguments: null,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: color14, 
-                          shape: RoundedRectangleBorder(
+                        SizedBox(width: 10),
+                        Container(
+                          width: 220,
+                          padding: EdgeInsets.only(left: 15.0, right: 10.0),
+                          decoration: BoxDecoration(
+                            color: color17,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _searchController,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Product name...",
+                                    hintStyle: TextStyle(color: color4),
+                                  ),
+                                  style: TextStyle(color: color4),
+                                ),
+                              ),
+                              Icon(Icons.search, color: color4, size: 25.0),
+                            ],
+                          ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.add, color: color4, size: 25.0),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 20.0),
-                  Container(
-                    height: 50,
-                    width: 390,
-                    margin: EdgeInsets.only(left: 10, right: 20),
-                    decoration: BoxDecoration(
-                      color: color13,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: RawScrollbar(
-                      controller: _scrollController,
-                      thumbVisibility: true,
-                      thumbColor: color4.withOpacity(0.5),
-                      radius: Radius.circular(10),
-                      thickness: 4,
-                      minThumbLength: 50,
-                      scrollbarOrientation: ScrollbarOrientation.bottom,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: productsManager.categories.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == 0) {
-                            return GestureDetector(
-                              onTap: () async {
-                                setState(() {
-                                  _selectedCategory = null;
-                                  _isLoading = true; // Set loading to true
-                                });
-                                await productsManager.fetchProducts();
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              },
-                              child: Container(
-                                margin: EdgeInsets.only(right: 10),
-                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: _selectedCategory == null ? color17 : color13,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'All',
-                                    style: TextStyle(
-                                      color: _selectedCategory == null ? color4 : color1,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                        SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              AddProductScreen.routeName,
+                              arguments: null,
                             );
-                          } else {
-                            final category = productsManager.categories[index - 1];
-                            return GestureDetector(
-                              onTap: () async {
-                                setState(() {
-                                  _selectedCategory = category;
-                                  _isLoading = true; // Set loading to true
-                                });
-                                await productsManager.fetchProducts(category: category);
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              },
-                              child: Container(
-                                margin: EdgeInsets.only(right: 10),
-                                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: _selectedCategory == category ? color17 : color13,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    category,
-                                    style: TextStyle(
-                                      color: _selectedCategory == category ? color4 : color1,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  _isLoading
-                      ? Expanded(
-                          child: Center(child: CircularProgressIndicator()),
-                        )
-                      : filteredProducts.isEmpty
-                          ? Expanded(
-                              child: Center(
-                                child: Text(
-                                  _searchQuery.isNotEmpty
-                                      ? "No products found matching '$_searchQuery'"
-                                      : _selectedCategory != null
-                                          ? "No products found in $_selectedCategory category"
-                                          : "No products found",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            )
-                          : Expanded(
-                              child: GridView.builder(
-                                padding: EdgeInsets.only(left: 8, right: 16),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                  childAspectRatio: 0.59,
-                                ),
-                                itemCount: filteredProducts.length,
-                                itemBuilder: (context, index) {
-                                  final product = filteredProducts[index];
-                                  return ProductItem(product: product);
-                                },
-                              ),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: color14,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                ],
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.add, color: color4, size: 25.0),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.0),
+                    Container(
+                      height: 50,
+                      width: 390,
+                      margin: EdgeInsets.only(left: 10, right: 20),
+                      decoration: BoxDecoration(
+                        color: color13,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: RawScrollbar(
+                        controller: _scrollController,
+                        thumbVisibility: true,
+                        thumbColor: color4.withOpacity(0.5),
+                        radius: Radius.circular(10),
+                        thickness: 4,
+                        minThumbLength: 50,
+                        scrollbarOrientation: ScrollbarOrientation.bottom,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: productsManager.categories.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    _selectedCategory = null;
+                                    _isLoading = false; 
+                                  });
+                                  await productsManager.fetchProducts();
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 10),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: _selectedCategory == null
+                                        ? color17
+                                        : color13,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'All',
+                                      style: TextStyle(
+                                        color: _selectedCategory == null
+                                            ? color4
+                                            : color1,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              final category =
+                                  productsManager.categories[index - 1];
+                              return GestureDetector(
+                                onTap: () async {
+                                  setState(() {
+                                    _selectedCategory = category;
+                                    _isLoading = false; 
+                                  });
+                                  await productsManager.fetchProducts(
+                                      category: category);
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 10),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: _selectedCategory == category
+                                        ? color17
+                                        : color13,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      category,
+                                      style: TextStyle(
+                                        color: _selectedCategory == category
+                                            ? color4
+                                            : color1,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    _isLoading
+                        ? Expanded(
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                        : filteredProducts.isEmpty
+                            ? Expanded(
+                                child: Center(
+                                  child: Text(
+                                    _searchQuery.isNotEmpty
+                                        ? "No products found matching '$_searchQuery'"
+                                        : _selectedCategory != null
+                                            ? "No products found in $_selectedCategory category"
+                                            : "No products found",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Expanded(
+                                child: GridView.builder(
+                                  padding: EdgeInsets.only(left: 8, right: 16),
+                                  gridDelegate:
+                                      SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                    childAspectRatio: 0.595,
+                                  ),
+                                  itemCount: filteredProducts.length,
+                                  itemBuilder: (context, index) {
+                                    final product = filteredProducts[index];
+                                    return ProductItem(product: product);
+                                  },
+                                ),
+                              ),
+                  ],
+                ),
               ),
             ),
-          ),
-  );
-}
+    );
+  }
 }
 
 class ProductItem extends StatelessWidget {

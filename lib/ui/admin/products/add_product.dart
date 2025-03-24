@@ -46,16 +46,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
       description: '',
       imageUrl: '',
       stockQuantity: 0,
-      category: _categories.first, // Set the default category
+      category: _categories.first, 
     );
-    _selectedCategory = _categories.first; // Initialize the selected category
+    _selectedCategory = _categories.first;  
   }
 
   Future<void> _saveForm() async {
-    // First validate the form
     final bool formIsValid = _editForm.currentState!.validate();
 
-    // Check if we have an image
     if (!_editedProduct.hasFeaturedImage()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select an image')),
@@ -63,9 +61,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
       return;
     }
 
-    // Ensure we have a category
     if (_selectedCategory == null || _selectedCategory!.isEmpty) {
-      _selectedCategory = _categories.first; // Fallback to the first category
+      _selectedCategory = _categories.first; 
       _editedProduct = _editedProduct.copyWith(category: _selectedCategory);
     }
 
@@ -73,10 +70,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
       return;
     }
 
-    // Save the form values to _editedProduct
     _editForm.currentState!.save();
 
-    // Show loading spinner
     setState(() {
       _isLoading = true;
     });
@@ -84,7 +79,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     try {
       final productsManager = context.read<AdminProductsManager>();
 
-      // Log what we're saving to help with debugging
       print('✅ Saving product with category: ${_editedProduct.category}');
       print(
           '✅ Saving product with stock quantity: ${_editedProduct.stockQuantity}');
@@ -116,6 +110,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       }
     }
   }
+
   Future<void> _pickImage() async {
     final imagePicker = ImagePicker();
     try {
@@ -167,7 +162,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Container(
-              color: color13, // Set background color here
+              color: color13, 
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Form(

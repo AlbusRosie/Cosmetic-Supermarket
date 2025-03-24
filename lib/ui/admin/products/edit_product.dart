@@ -43,10 +43,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'Setting Powder'
   ];
 
+  // Focus node for the description field to detect when it's clicked
+  final _descriptionFocusNode = FocusNode();
+  bool _isDescriptionExpanded = false;
+
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, _loadProduct);
+
+    // Add a listener to the focus node to expand the description field when focused
+    _descriptionFocusNode.addListener(() {
+      setState(() {
+        _isDescriptionExpanded = _descriptionFocusNode.hasFocus;
+      });
+    });
   }
 
   void _loadProduct() {
@@ -187,7 +198,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   label: const Text('Pick Image'),
                   onPressed: _pickImage,
                   style: TextButton.styleFrom(
-                    foregroundColor: color4, // Màu khi click
+                    foregroundColor: color4, 
                   ),
                 ),
               ),
@@ -199,12 +210,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   Widget _buildTextField(TextEditingController controller, String label,
-      [TextInputType keyboardType = TextInputType.text]) {
+      [TextInputType keyboardType = TextInputType.text,
+      bool isDescription = false]) {
     return TextFormField(
       controller: controller,
       decoration: _buildInputDecoration(label),
-      keyboardType: keyboardType,
+      keyboardType: isDescription ? TextInputType.multiline : keyboardType,
       cursorColor: color4,
+      maxLines: isDescription
+          ? (_isDescriptionExpanded ? null : 1)
+          : 1,  
+      minLines: isDescription ? 1 : null, 
+      focusNode: isDescription
+          ? _descriptionFocusNode
+          : null, 
       validator: (value) => value!.isEmpty ? 'Please enter $label.' : null,
       onSaved: (value) {
         if (label == 'Title') {
@@ -247,7 +266,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     _buildTextField(
                         _priceController, 'Price', TextInputType.number),
                     const SizedBox(height: 30),
-                    _buildTextField(_descriptionController, 'Description'),
+                    _buildTextField(_descriptionController, 'Description',
+                        TextInputType.multiline, true),
                     const SizedBox(height: 30),
                     _buildTextField(_stockController, 'Stock Quantity',
                         TextInputType.number),
@@ -274,5 +294,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
             ),
     );
+  }
+
+  @override
+  void dispose() {
+    _descriptionFocusNode.dispose();
+    _titleController.dispose();
+    _priceController.dispose();
+    _descriptionController.dispose();
+    _stockController.dispose();
+    super.dispose();
   }
 }
