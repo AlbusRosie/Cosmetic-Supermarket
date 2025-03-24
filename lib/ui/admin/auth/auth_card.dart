@@ -25,15 +25,16 @@ class _AuthCardState extends State<AuthCard> {
   };
   final _isSubmitting = ValueNotifier<bool>(false);
   final _passwordController = TextEditingController();
-  final _confirmPasswordController =
-      TextEditingController(); // Added controller
+  final _confirmPasswordController = TextEditingController();
+  final _emailController = TextEditingController(); 
   bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true; // Added for independent toggle
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -114,24 +115,40 @@ class _AuthCardState extends State<AuthCard> {
     }
 
     try {
+      final authManager = context.read<AuthManager>();
       if (_authMode == AuthMode.login) {
-        await context.read<AuthManager>().login(
-              _authData['email']!,
-              _authData['password']!,
-            );
+        await authManager.login(
+          _authData['email']!,
+          _authData['password']!,
+        );
       } else {
-        await context.read<AuthManager>().signup(
-              _authData['username']!,
-              _authData['email']!,
-              _authData['phone']!,
-              _authData['password']!,
-            );
+        await authManager.signup(
+          _authData['username']!,
+          _authData['email']!,
+          _authData['phone']!,
+          _authData['password']!,
+        );
+        await authManager.logout();
+        if (mounted) {
+          await showSuccessDialog(
+              context, 'Account created successfully! Please log in.');
+        }
+        final email = _authData['email'];
+        final password = _authData['password'];
+        _authData['username'] = '';
+        _authData['phone'] = '';
+        _confirmPasswordController.clear();
         _switchAuthMode();
+        setState(() {
+          _authData['email'] = email!;
+          _authData['password'] = password!;
+          _emailController.text = email;
+          _passwordController.text = password;
+        });
       }
     } catch (error) {
       log('$error');
       if (mounted) {
-        // Clean up error message to remove redundant "Exception: " prefix
         String errorMessage = error.toString();
         while (errorMessage.startsWith('Exception: ')) {
           errorMessage = errorMessage.substring('Exception: '.length);
@@ -240,6 +257,7 @@ class _AuthCardState extends State<AuthCard> {
     return _buildTextField(
       hintText: "Email",
       icon: Icons.email,
+      controller: _emailController, 
       onSaved: (value) => _authData['email'] = value!,
     );
   }

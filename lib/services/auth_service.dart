@@ -29,32 +29,32 @@ class AuthService {
   }
 
   Future<User> signup(
-    String username, String email, String phone, String password) async {
-      final pb = await getPocketbaseInstance();
-      if (pb == null) {
-        throw Exception("PocketBase not initialized. Please restart the app.");
+      String username, String email, String phone, String password) async {
+    final pb = await getPocketbaseInstance();
+    if (pb == null) {
+      throw Exception("PocketBase not initialized. Please restart the app.");
+    }
+
+    try {
+      // Check if the email already exists
+      final existingEmailUsers = await pb.collection('users').getList(
+            filter: 'email = "$email"',
+          );
+      if (existingEmailUsers.items.isNotEmpty) {
+        throw Exception(
+            "This email is already registered. Please use a different one.");
       }
 
-      try {
-        // Check if the email already exists
-        final existingEmailUsers = await pb.collection('users').getList(
-              filter: 'email = "$email"',
-            );
-        if (existingEmailUsers.items.isNotEmpty) {
-          throw Exception(
-              "This email is already registered. Please use a different one.");
-        }
+      // Check if the phone number already exists
+      final existingPhoneUsers = await pb.collection('users').getList(
+            filter: 'phone = "$phone"',
+          );
+      if (existingPhoneUsers.items.isNotEmpty) {
+        throw Exception(
+            "This phone number is already in use. Please use a different one.");
+      }
 
-        // Check if the phone number already exists
-        final existingPhoneUsers = await pb.collection('users').getList(
-              filter: 'phone = "$phone"',
-            );
-        if (existingPhoneUsers.items.isNotEmpty) {
-          throw Exception(
-              "This phone number is already in use. Please use a different one.");
-        }
-
-        print('Creating user: $email');
+      print('Creating user: $email');
 
       final record = await pb.collection('users').create(body: {
         'username': username,
