@@ -51,11 +51,9 @@ class _AppDrawerState extends State<AppDrawer>
     try {
       await Provider.of<UsersManager>(context, listen: false).fetchUser();
       final authManager = Provider.of<AuthManager>(context, listen: false);
-      // Assuming AuthManager has a method or property to check if the user is an admin
-      // Replace `isAdmin` with the actual method/property from your AuthManager
+
       setState(() {
-        _isAdmin =
-            authManager.isStaff; // Adjust based on your AuthManager
+        _isAdmin = authManager.isStaff; 
       });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +89,7 @@ class _AppDrawerState extends State<AppDrawer>
     bool isAdminStyle = false,
   }) {
     if (isAdminStyle) {
-      // Admin style (from AdminAppDrawer)
+      // Admin style
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         decoration: BoxDecoration(
@@ -122,7 +120,7 @@ class _AppDrawerState extends State<AppDrawer>
         ),
       );
     } else {
-      // Regular user style (from AppDrawer)
+      // Regular user style 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         child: AnimatedContainer(
@@ -339,7 +337,6 @@ class _AppDrawerState extends State<AppDrawer>
     );
   }
 
-  
   // Build the regular user drawer content
   Widget _buildRegularDrawerContent(BuildContext context) {
     final userManager = Provider.of<UsersManager>(context);
