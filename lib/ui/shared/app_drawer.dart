@@ -1,3 +1,4 @@
+
 import 'package:ct312h_project/components/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,8 @@ const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
 const Color laranaPinkLight = Color(0xFFFFF0F0);
 
 class AppDrawer extends StatefulWidget {
-  const AppDrawer({super.key});
+  final bool isAdmin; // Admin status passed from parent widget
+  const AppDrawer({super.key, required this.isAdmin});
 
   @override
   State<AppDrawer> createState() => _AppDrawerState();
@@ -26,7 +28,6 @@ class _AppDrawerState extends State<AppDrawer>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   bool _isLoadingUser = true; // Track loading state for user data
-  bool _isAdmin = false; // Track if the user is an admin
 
   @override
   void initState() {
@@ -50,10 +51,8 @@ class _AppDrawerState extends State<AppDrawer>
     });
     try {
       await Provider.of<UsersManager>(context, listen: false).fetchUser();
-      final authManager = Provider.of<AuthManager>(context, listen: false);
-
       setState(() {
-        _isAdmin = authManager.isStaff; 
+      _isLoadingUser = true;
       });
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -525,14 +524,14 @@ class _AppDrawerState extends State<AppDrawer>
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: _isAdmin ? Colors.transparent : Colors.white,
-      elevation: _isAdmin ? 0 : 5,
-      shape: _isAdmin
+      backgroundColor: widget.isAdmin ? Colors.transparent : Colors.white,
+      elevation: widget.isAdmin ? 0 : 5,
+      shape: widget.isAdmin
           ? null
           : const RoundedRectangleBorder(
               borderRadius: BorderRadius.horizontal(right: Radius.circular(20)),
             ),
-      child: _isAdmin
+      child: widget.isAdmin
           ? _buildAdminDrawerContent(context)
           : _buildRegularDrawerContent(context),
     );

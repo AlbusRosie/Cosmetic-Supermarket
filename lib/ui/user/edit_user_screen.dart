@@ -148,6 +148,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     const Color laranaPink = Color.fromARGB(255, 255, 158, 158);
 
     return Scaffold(
@@ -156,7 +157,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: laranaPink),
       ),
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: laranaPink))
           : Container(

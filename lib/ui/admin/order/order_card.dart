@@ -91,7 +91,7 @@ class OrderItemCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              DateFormat('dd/MM/yyyy').format(order.dateTime),
+                              DateFormat('dd/MM/yyyy [HH:mm:ss]').format(order.dateTime),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],

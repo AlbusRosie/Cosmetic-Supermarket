@@ -7,6 +7,7 @@ import '../../shared/dialog_utils.dart';
 import 'add_product.dart';
 import 'edit_product.dart';
 import 'products_manager.dart';
+import '../auth/auth_manager.dart';
 
 class AdminProductsScreen extends StatefulWidget {
   static const routeName = '/admin_product_screen';
@@ -61,6 +62,7 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
   Widget build(BuildContext context) {
     final productsManager =
         Provider.of<AdminProductsManager>(context, listen: true);
+        final authManager = Provider.of<AuthManager>(context);
 
     // Filter products based on category and search query
     var filteredProducts = productsManager.items;
@@ -78,7 +80,7 @@ class _AdminProductScreenState extends State<AdminProductsScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : SafeArea(

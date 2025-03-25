@@ -4,6 +4,7 @@ import 'cart_manager.dart';
 import 'cart_item_card.dart';
 import '../orders/orders_manager.dart';
 import '../shared/app_drawer.dart';
+import '../admin/auth/auth_manager.dart';
 
 class CartScreen extends StatefulWidget {
   static const routeName = '/cart';
@@ -36,6 +37,7 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     final cart = context.watch<CartManager>();
     final colorScheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFFFF9AA2),
@@ -68,7 +70,7 @@ class _CartScreenState extends State<CartScreen> {
           ),
           iconTheme: const IconThemeData(color: Color(0xFFFF9AA2)),
         ),
-        drawer: const AppDrawer(),
+        drawer: AppDrawer(isAdmin: authManager.isStaff),
         backgroundColor: colorScheme.surface,
         body: Column(
           children: [

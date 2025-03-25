@@ -1,3 +1,4 @@
+import '../admin/auth/auth_manager.dart';
 import 'products_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -82,6 +83,7 @@ class _UserProductsScreenState extends State<UserProductsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 245, 245),
       appBar: AppBar(
@@ -136,7 +138,7 @@ class _UserProductsScreenState extends State<UserProductsScreen>
           ),
         ],
       ),
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: FutureBuilder(
         future: _fetchProducts,
         builder: (context, snapshot) {

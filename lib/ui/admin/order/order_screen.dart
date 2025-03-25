@@ -5,6 +5,7 @@ import 'order_manager.dart';
 import 'order_card.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
+import '../auth/auth_manager.dart';
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
@@ -45,9 +46,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : SafeArea(

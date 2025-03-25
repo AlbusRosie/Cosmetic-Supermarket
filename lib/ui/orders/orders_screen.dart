@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../admin/auth/auth_manager.dart';
 import '../shared/app_drawer.dart';
 import 'orders_manager.dart';
 import '../orders/order_item_cart.dart';
+
 const Color primaryColor = Color.fromARGB(255, 231, 110, 110);
 const Color secondaryColor = Color(0xFFFFDDE1); 
 const Color backgroundColor = Color(0xFFFAFAFA); 
@@ -26,6 +28,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
@@ -44,7 +47,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(15)),
         ),
       ),
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: FutureBuilder(
         future: _fetchOrders,
         builder: (ctx, snapshot) {

@@ -4,6 +4,7 @@ import '../../shared/app_drawer.dart';
 import 'adminUser_manager.dart';
 import 'package:provider/provider.dart';
 import '../../../components/colors.dart';
+import '../auth/auth_manager.dart';
 
 class AdminUsersScreen extends StatefulWidget {
   static const routeName = '/admin_users';
@@ -45,9 +46,10 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authManager = Provider.of<AuthManager>(context);
     return Scaffold(
       key: _scaffoldKey,
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(isAdmin: authManager.isStaff),
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(left: 10, top: 10, right: 10),

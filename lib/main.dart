@@ -23,6 +23,173 @@ import 'ui/admin/order/order_manager.dart';
 import 'ui/admin/user/adminUser_manager.dart';
 import 'ui/admin/products/products_manager.dart';
 
+class SlideUpRoute extends PageRouteBuilder {
+  final Widget page;
+
+  SlideUpRoute({required this.page})
+      : super(
+          transitionDuration: const Duration(milliseconds: 500),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, 1),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutQuart,
+            )),
+            child: child,
+          ),
+        );
+}
+
+class ScaleRoute extends PageRouteBuilder {
+  final Widget page;
+
+  ScaleRoute({required this.page})
+      : super(
+          transitionDuration: const Duration(milliseconds: 400),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              ScaleTransition(
+            scale: Tween<double>(
+              begin: 0.0,
+              end: 1.0,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.fastOutSlowIn,
+            )),
+            child: child,
+          ),
+        );
+}
+
+class FadeSlideRoute extends PageRouteBuilder {
+  final Widget page;
+
+  FadeSlideRoute({required this.page})
+      : super(
+          transitionDuration: const Duration(milliseconds: 400),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) {
+            const begin = Offset(0.2, 0.0); 
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+
+            var slideTween = Tween<Offset>(begin: begin, end: end).animate(
+              CurvedAnimation(parent: animation, curve: curve),
+            );
+
+            var fadeTween = Tween<double>(begin: 0.0, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: curve),
+            );
+
+            return FadeTransition(
+              opacity: fadeTween,
+              child: SlideTransition(
+                position: slideTween,
+                child: child,
+              ),
+            );
+          },
+        );
+}
+class SlideRightRoute extends PageRouteBuilder {
+  final Widget page;
+
+  SlideRightRoute({required this.page})
+      : super(
+          transitionDuration: const Duration(milliseconds: 400),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1.0, 0.0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            )),
+            child: child,
+          ),
+        );
+}
+
+class SlideLeftRoute extends PageRouteBuilder {
+  final Widget page;
+
+  SlideLeftRoute({required this.page})
+      : super(
+          transitionDuration: const Duration(milliseconds: 400),
+          reverseTransitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) =>
+              page,
+          transitionsBuilder: (
+            BuildContext context,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+            Widget child,
+          ) =>
+              SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1.0, 0.0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            )),
+            child: child,
+          ),
+        );
+}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
@@ -90,7 +257,6 @@ class _LaranaState extends State<Larana> {
       child: Builder(
         builder: (context) {
           final authManager = Provider.of<AuthManager>(context, listen: false);
-          // Call initialize only once
           if (!authManager.isInitialized) {
             authManager.initialize();
           }
@@ -131,17 +297,23 @@ class _LaranaState extends State<Larana> {
                   AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
                 },
                 onGenerateRoute: (settings) {
+                  print('🔴 Navigating to route: ${settings.name}');
                   switch (settings.name) {
+                    case AdminProductsScreen.routeName:
+                      return SlideUpRoute(page: const AdminProductsScreen());
+                    case AddProductScreen.routeName:
+                      return ScaleRoute(page: const AddProductScreen());
+                    case AdminUsersScreen.routeName:
+                      return SlideRightRoute(page: const AdminUsersScreen());
+                    case EditProductScreen.routeName:
+                      return ScaleRoute(page: const EditProductScreen());
+                    case AdminOrdersScreen.routeName:
+                      return SlideLeftRoute(page: const AdminOrdersScreen());
                     case EditUserScreen.routeName:
                       final user = settings.arguments as User?;
-                      return MaterialPageRoute(
-                        builder: (ctx) => SafeArea(child: EditUserScreen(user)),
-                      );
-                    case EditProductScreen.routeName:
-                      return MaterialPageRoute(
-                        builder: (ctx) => const EditProductScreen(),
-                      );
+                      return FadeSlideRoute(page: EditUserScreen(user));
                     default:
+                      print('🔴 Unknown route: ${settings.name}');
                       return MaterialPageRoute(
                         builder: (ctx) => const SafeArea(
                           child: Scaffold(
@@ -151,9 +323,7 @@ class _LaranaState extends State<Larana> {
                   }
                 },
                 onUnknownRoute: (settings) {
-                  return MaterialPageRoute(
-                    builder: (ctx) => const UserProductsScreen(),
-                  );
+                  return SlideUpRoute(page: const UserProductsScreen());
                 },
               );
             },
