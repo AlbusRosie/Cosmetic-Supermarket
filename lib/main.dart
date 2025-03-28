@@ -289,12 +289,12 @@ class _LaranaState extends State<Larana> {
                       const SafeArea(child: OrdersScreen()),
                   AuthScreen.routeName: (ctx) =>
                       const SafeArea(child: AuthScreen()),
-                  AdminProductsScreen.routeName: (ctx) =>
-                      const AdminProductsScreen(),
-                  AddProductScreen.routeName: (ctx) => const AddProductScreen(),
-                  AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
+                  // AdminProductsScreen.routeName: (ctx) =>
+                  //     const AdminProductsScreen(),
+                  // AddProductScreen.routeName: (ctx) => const AddProductScreen(),
+                  // AdminUsersScreen.routeName: (ctx) => const AdminUsersScreen(),
                   EditProductScreen.routeName: (ctx) => EditProductScreen(),
-                  AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
+                  // AdminOrdersScreen.routeName: (ctx) => AdminOrdersScreen(),
                 },
                 onGenerateRoute: (settings) {
                   print('🔴 Navigating to route: ${settings.name}');
@@ -305,8 +305,6 @@ class _LaranaState extends State<Larana> {
                       return ScaleRoute(page: const AddProductScreen());
                     case AdminUsersScreen.routeName:
                       return SlideRightRoute(page: const AdminUsersScreen());
-                    case EditProductScreen.routeName:
-                      return ScaleRoute(page: const EditProductScreen());
                     case AdminOrdersScreen.routeName:
                       return SlideLeftRoute(page: const AdminOrdersScreen());
                     case EditUserScreen.routeName:

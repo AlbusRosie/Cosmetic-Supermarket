@@ -58,7 +58,9 @@ class OrdersService {
               id: cartJson['id'] ?? '',
               productId: cartJson['productId'] ?? '',
               title: productJson['title'] ?? 'Unknown Product',
-              price: productJson['price'] ?? 0.0,
+              price: (productJson['price'] is int)
+                  ? (productJson['price'] as int).toDouble()
+                  : (productJson['price'] ?? 0.0).toDouble(),
               quantity: cartJson['quantity'] ?? 0,
               status: cartJson['status'] ?? 'pending',
             ));
