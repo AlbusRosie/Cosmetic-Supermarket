@@ -26,6 +26,13 @@ The **Cosmetic Supermarket Application** is a mobile solution designed to replic
 - 📊 **Order Processing**: View, update, and manage all orders in the system, including changing status and viewing customer details.
 - 👥 **User Management**: Monitor users, handle issues, and maintain the integrity of the platform.
 
+---
+
+## 📺 Demo
+
+👉 [Cosmetic Mini-Supermarket Demo](https://youtu.be/e2kw68T8FDI?si=lbiYDRiRXbWy8zKZ)
+
+---
 ## 💡 Features
 
 - Real-time product listings and updates
