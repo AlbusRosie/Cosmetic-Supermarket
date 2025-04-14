@@ -12,7 +12,7 @@ Semester 2, Academic year: 2024-2025
 
 ## 🧾 Overview
 
-The **Cosmetic Supermarket Application** is a cross-platform mobile app developed to streamline operations for a cosmetics supermarket. It supports two key user roles:
+The **Cosmetic Supermarket Application** is a mobile solution designed to replicate the essential functions of a cosmetics retail system, offering dedicated features for both customers (users) and administrators. It supports two key user roles:
 
 ### 👤 User Role (Customer)
 - 🛍️ **Product Discovery**: Browse and search a wide range of cosmetics, including featured and categorized items.
