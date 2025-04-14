@@ -94,3 +94,11 @@ flutter pub get
 
 # Run the app on emulator or connected device
 flutter run
+
+```
+---
+## 📬 Contact
+
+For feedback or questions, please reach out via GitHub or Gmail.
+
+> ✨ *This project is for educational purposes only.*
